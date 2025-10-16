@@ -1612,13 +1612,25 @@ const AntiMacro = (function () {
         function init() {
             // Charger la sauvegarde
             loadGame();
+
+            AntiMacro.init();
             
             // Bouton Ponction
-            document.getElementById('ponction-btn').addEventListener('click', () => {
+            document.getElementById('ponction-btn').addEventListener('click', (e) => {
+                const verdict = AntiMacro.beforeClick(e);
+                if (!verdict.allowed) {
+                    AntiMacro.onIgnored(verdict.reason);
+                    return;
+                }
+                
                 const state = State.get();
-                state.hemoglobines += state.clickPower * getNerfsMultiplier();
+                const clickMults = GameManager.getRitualMultipliers().click || 1;
+                const humanPenalty = verdict.penalty ?? 1;
+                
+                const gain = state.clickPower * GameManager.getNerfsMultiplier() * clickMults * humanPenalty;
+                state.hemoglobines += gain;
                 state.totalClicks++;
-                state.totalProduced += state.clickPower;
+                state.totalProduced += gain;
                 
                 // Effets visuels
                 const btn = document.getElementById('ponction-btn');
@@ -1628,11 +1640,12 @@ const AntiMacro = (function () {
                 UI.playClickSound();
                 UI.updateAll();
                 
-                // Petite chance d'événement
+                // Chance d'événement (inchangé)
                 if (Math.random() < 0.01) {
                     Events.checkEvents();
                 }
-            });
+                });
+            
             
             // Game tick
             tickInterval = setInterval(gameTick, 250);
@@ -1919,7 +1932,9 @@ const AntiMacro = (function () {
             triggerEnding,
             exportSave,
             importSave,
-            newGame
+            newGame,
+            getNerfsMultiplier,   
+            getRitualMultipliers    
         };
     })();
 
