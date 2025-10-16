@@ -1410,6 +1410,200 @@
         };
     })();
 
+    
+// Module AntiMacro
+const AntiMacro = (function () {
+    const cfg = {
+        windowSize: 40,        // nb de clics analysés
+        maxCps: 12,            // seuil de CPS dur
+        minStdMs: 12,          // écart-type (ms) en-dessous => trop régulier
+        minMeanMs: 40,         // moyenne (ms) en-dessous => trop rapide
+        minMovePerClick: 2,    // px de mouvement moyen entre clics
+        lockDurMs: 8000,       // durée blocage si suspicion forte
+        challengeDurMs: 9000,  // durée max du challenge
+        decayPerSec: 10        // baisse suspicion/s (si comportement humain)
+    };
+
+    let clickTimes = [];
+    let mouseMoves = 0;
+    let lastMouse = { x: null, y: null };
+    let suspicion = 0;
+    let lockedUntil = 0;
+    let droppedClicksWindow = { count: 0, ts: 0 };
+    let challengeActive = false;
+
+    function now() { return performance.now(); }
+
+    function init() {
+        window.addEventListener('mousemove', (e) => {
+            if (lastMouse.x !== null) {
+                mouseMoves += Math.hypot(e.clientX - lastMouse.x, e.clientY - lastMouse.y);
+            }
+            lastMouse = { x: e.clientX, y: e.clientY };
+        });
+
+        // suspicion decays over time
+        setInterval(() => {
+            suspicion = Math.max(0, suspicion - cfg.decayPerSec);
+        }, 1000);
+    }
+
+    // stats helpers
+    function stats(arr) {
+        if (arr.length < 2) return { mean: Infinity, std: Infinity, cps: 0 };
+        const diffs = [];
+        for (let i = 1; i < arr.length; i++) diffs.push(arr[i] - arr[i - 1]);
+        const mean = diffs.reduce((a, b) => a + b, 0) / diffs.length;
+        const var_ = diffs.reduce((a, d) => a + (d - mean) * (d - mean), 0) / diffs.length;
+        const std = Math.sqrt(var_);
+        return { mean, std, cps: 1000 / mean };
+    }
+
+    function hardRateLimit(ts) {
+        // fenêtre 1s pour drop les clics > maxCps
+        if (ts - droppedClicksWindow.ts > 1000) {
+            droppedClicksWindow.ts = ts;
+            droppedClicksWindow.count = 0;
+        }
+        if (++droppedClicksWindow.count > cfg.maxCps) return true;
+        return false;
+    }
+
+    function shouldChallenge(st) {
+        // trop rapide ET trop régulier OU pas de mouvement souris
+        const noMove = avgMovePerClick() < cfg.minMovePerClick && st.cps > 5;
+        const tooRegular = st.std < cfg.minStdMs && st.mean < 100;
+        const tooFast = st.mean < cfg.minMeanMs || st.cps > cfg.maxCps;
+        if (tooFast) suspicion += 25;
+        if (tooRegular) suspicion += 30;
+        if (noMove) suspicion += 20;
+        return suspicion >= 100;
+    }
+
+    function avgMovePerClick() {
+        const n = Math.max(1, clickTimes.length);
+        return mouseMoves / n;
+    }
+
+    function showChallenge() {
+        if (challengeActive) return false;
+        challengeActive = true;
+
+        const overlay = document.getElementById('overlay');
+        overlay.style.display = 'block';
+
+        const popup = document.createElement('div');
+        popup.className = 'event-popup';
+        const code = String.fromCharCode(65 + Math.floor(Math.random() * 26)); // A-Z
+        const holdTime = 2000 + Math.floor(Math.random() * 1500); // 2-3.5s
+
+        popup.innerHTML = `
+            <div class="event-title">Vérification anti-macro</div>
+            <div class="event-text">
+                Maintiens la touche <b>${code}</b> enfoncée pendant ~${Math.round(holdTime/1000)}s.
+                <div id="challenge-bar" style="height:8px;border:1px solid var(--accent-rust);margin-top:10px;">
+                    <div id="challenge-fill" style="height:100%;width:0%;background:var(--accent-blood)"></div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(popup);
+
+        let down = false, start = 0, rafId;
+        function update() {
+            if (!down) return;
+            const p = Math.min(1, (now() - start) / holdTime);
+            const fill = popup.querySelector('#challenge-fill');
+            if (fill) fill.style.width = (p * 100).toFixed(1) + '%';
+            if (p >= 1) done(true);
+            else rafId = requestAnimationFrame(update);
+        }
+
+        function keydown(e) {
+            if (e.key.toUpperCase() !== code) return;
+            if (!down) { down = true; start = now(); update(); }
+        }
+        function keyup(e) {
+            if (e.key.toUpperCase() !== code) return;
+            down = false;
+            cancelAnimationFrame(rafId);
+        }
+
+        const timeout = setTimeout(() => done(false), cfg.challengeDurMs);
+
+        function done(success) {
+            clearTimeout(timeout);
+            cancelAnimationFrame(rafId);
+            window.removeEventListener('keydown', keydown);
+            window.removeEventListener('keyup', keyup);
+            overlay.style.display = 'none';
+            popup.remove();
+            challengeActive = false;
+
+            if (success) {
+                suspicion = 0;
+                Events.addJournalEntry('Contrôle humain réussi. Suspension levée.');
+            } else {
+                // sanction : lock + léger malus
+                lockedUntil = now() + cfg.lockDurMs;
+                const s = State.get();
+                s.nerfs = Math.max(0, s.nerfs - 5);
+                s.alarme = Math.min(100, s.alarme + 5);
+                Events.addJournalEntry('Contrôle échoué. Clics temporairement bloqués.');
+            }
+        }
+
+        window.addEventListener('keydown', keydown);
+        window.addEventListener('keyup', keyup);
+        return true;
+    }
+
+    function beforeClick(e) {
+        const t = now();
+
+        // 1) bloquer tout si lock actif
+        if (t < lockedUntil) return { allowed: false, reason: 'locked' };
+
+        // 2) ne compter que les clics "de confiance"
+        if (!e.isTrusted) {
+            suspicion += 50;
+            if (suspicion >= 100) showChallenge();
+            return { allowed: false, reason: 'untrusted' };
+        }
+
+        // 3) hard rate limit à 12 cps: on ignore le reste
+        if (hardRateLimit(t)) return { allowed: false, reason: 'rate' };
+
+        // 4) stats
+        clickTimes.push(t);
+        if (clickTimes.length > cfg.windowSize) clickTimes.shift();
+        const st = stats(clickTimes);
+
+        // 5) détection patterns suspects
+        if (shouldChallenge(st)) {
+            showChallenge();
+            return { allowed: false, reason: 'challenge' };
+        }
+
+        // 6) shadow-cap: si suspicion modérée, réduire l’efficacité du clic
+        let penalty = 1.0;
+        if (suspicion >= 60) penalty = 0.25;
+        else if (suspicion >= 30) penalty = 0.5;
+
+        return { allowed: true, penalty };
+    }
+
+    function onIgnored(reason) {
+        // petit feedback dans le journal (pas à chaque drop pour éviter le spam)
+        if (reason === 'rate') return;
+        if (reason === 'untrusted') Events.addJournalEntry('[Anti-macro] Clic non fiable ignoré.');
+        if (reason === 'locked') Events.addJournalEntry('[Anti-macro] Blocage temporaire en cours.');
+        if (reason === 'challenge') Events.addJournalEntry('[Anti-macro] Vérification en cours…');
+    }
+
+    return { init, beforeClick, onIgnored };
+})();
+
+
     // Module GameManager
     const GameManager = (function() {
         let saveInterval;
