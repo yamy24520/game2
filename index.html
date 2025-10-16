@@ -1432,7 +1432,7 @@
                 setTimeout(() => btn.classList.remove('tremble'), 100);
                 
                 UI.playClickSound();
-                UI.updateResources();
+                UI.updateAll();
                 
                 // Petite chance d'événement
                 if (Math.random() < 0.01) {
@@ -1519,7 +1519,7 @@
             checkEndings();
             
             // Update UI
-            UI.updateResources();
+            UI.updateAll();
         }
 
         function getNerfsMultiplier() {
