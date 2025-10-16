@@ -1,0 +1,1738 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hémoglobine Industrielle</title>
+    <style>
+        /* Variables globales */
+        :root {
+            --bg-main: #0a0a0a;
+            --bg-secondary: #141414;
+            --bg-panel: #1a1616;
+            --text-primary: #c4b5a0;
+            --text-secondary: #887766;
+            --accent-blood: #8b0000;
+            --accent-rust: #b7410e;
+            --accent-oil: #1c1c1c;
+            --border: #3a2a2a;
+            --glow-red: rgba(139, 0, 0, 0.6);
+        }
+
+        /* Reset et base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Animations */
+        @keyframes pulse-blood {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes drip {
+            0% { transform: translateY(-2px); }
+            100% { transform: translateY(2px); }
+        }
+
+        @keyframes tremble {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-1px); }
+            75% { transform: translateX(1px); }
+        }
+
+        .blood-text {
+            text-shadow: 0 0 5px var(--glow-red);
+            animation: pulse-blood 3s infinite;
+        }
+
+        .tremble {
+            animation: tremble 0.1s;
+        }
+
+        /* Header */
+        #header {
+            background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-panel) 100%);
+            border-bottom: 2px solid var(--border);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .resources {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .resource {
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .resource-name {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .resource-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 0.2rem 0;
+        }
+
+        .resource-bar {
+            height: 4px;
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .resource-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .fill-hemoglobine { background: var(--accent-blood); }
+        .fill-residus { background: var(--accent-rust); }
+        .fill-nerfs { background: #666; }
+        .fill-alarme { background: #ff4444; }
+
+        /* Layout principal */
+        #main-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 1rem;
+            padding: 1rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 1024px) {
+            #main-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Panneaux */
+        .panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .panel-title {
+            font-size: 1rem;
+            text-transform: uppercase;
+            color: var(--accent-rust);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Bouton Ponction */
+        #ponction-btn {
+            width: 100%;
+            padding: 2rem;
+            background: radial-gradient(circle, var(--accent-blood) 0%, var(--bg-secondary) 100%);
+            border: 2px solid var(--accent-rust);
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        #ponction-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px var(--glow-red);
+        }
+
+        #ponction-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Upgrades et producteurs */
+        .upgrade, .producer, .ritual {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 0.8rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .upgrade:hover, .producer:hover, .ritual:hover {
+            border-color: var(--accent-rust);
+            transform: translateX(2px);
+        }
+
+        .item-name {
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .item-cost {
+            color: var(--accent-blood);
+            font-size: 0.9rem;
+        }
+
+        .item-level {
+            position: absolute;
+            right: 0.8rem;
+            top: 0.8rem;
+            background: var(--accent-rust);
+            color: var(--bg-main);
+            padding: 0.2rem 0.5rem;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .item-description {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.3rem;
+            font-style: italic;
+        }
+
+        .disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .disabled:hover {
+            transform: none;
+            border-color: var(--border);
+        }
+
+        /* Journal */
+        #journal {
+            height: 400px;
+            overflow-y: auto;
+            background: var(--bg-secondary);
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .journal-entry {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .journal-time {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        /* Événements */
+        .event-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-panel);
+            border: 2px solid var(--accent-blood);
+            padding: 2rem;
+            z-index: 1000;
+            max-width: 500px;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from { transform: translate(-50%, -60%); opacity: 0; }
+            to { transform: translate(-50%, -50%); opacity: 1; }
+        }
+
+        .event-title {
+            font-size: 1.2rem;
+            color: var(--accent-blood);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .event-text {
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .event-choices {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .event-choice {
+            flex: 1;
+            padding: 0.8rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--accent-rust);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .event-choice:hover {
+            background: var(--accent-rust);
+            color: var(--bg-main);
+        }
+
+        /* Whispers */
+        .whisper {
+            position: fixed;
+            bottom: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--accent-blood);
+            font-style: italic;
+            opacity: 0;
+            animation: whisperFade 4s;
+            pointer-events: none;
+            text-shadow: 0 0 10px var(--glow-red);
+        }
+
+        @keyframes whisperFade {
+            0% { opacity: 0; }
+            20% { opacity: 0.8; }
+            80% { opacity: 0.8; }
+            100% { opacity: 0; }
+        }
+
+        /* Options */
+        #options-panel {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            padding: 0.5rem;
+        }
+
+        .option-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 0.5rem;
+            margin: 0.2rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .option-btn:hover {
+            border-color: var(--accent-rust);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-main);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-rust);
+            border-radius: 4px;
+        }
+
+        /* Effets spéciaux */
+        .contaminated {
+            animation: contamination 2s infinite;
+        }
+
+        @keyframes contamination {
+            0%, 100% { filter: hue-rotate(0deg); }
+            50% { filter: hue-rotate(20deg) saturate(1.5); }
+        }
+
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 999;
+            display: none;
+        }
+
+        .ending-screen {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-main);
+            border: 3px solid var(--accent-blood);
+            padding: 3rem;
+            text-align: center;
+            z-index: 10000;
+            max-width: 600px;
+        }
+
+        .ending-title {
+            font-size: 2rem;
+            color: var(--accent-blood);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .ending-text {
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .restart-btn {
+            padding: 1rem 2rem;
+            background: var(--accent-blood);
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 1rem;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div id="header">
+        <div class="resources">
+            <div class="resource">
+                <div class="resource-name">Hémoglobines</div>
+                <div class="resource-value blood-text" id="hemoglobines">0</div>
+            </div>
+            <div class="resource">
+                <div class="resource-name">Résidus</div>
+                <div class="resource-value" id="residus">0</div>
+            </div>
+            <div class="resource">
+                <div class="resource-name">Nerfs</div>
+                <div class="resource-value" id="nerfs">100</div>
+                <div class="resource-bar">
+                    <div class="resource-fill fill-nerfs" id="nerfs-bar" style="width: 100%"></div>
+                </div>
+            </div>
+            <div class="resource">
+                <div class="resource-name">Alarme</div>
+                <div class="resource-value" id="alarme">0</div>
+                <div class="resource-bar">
+                    <div class="resource-fill fill-alarme" id="alarme-bar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container principal -->
+    <div id="main-container">
+        <!-- Colonne gauche -->
+        <div id="left-column">
+            <div class="panel">
+                <div class="panel-title">Extraction</div>
+                <button id="ponction-btn">PONCTION</button>
+                <div id="click-power" style="text-align: center; margin-top: 0.5rem; font-size: 0.9rem;">
+                    +<span id="click-value">1</span> / clic
+                </div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-title">Améliorations</div>
+                <div id="upgrades"></div>
+            </div>
+        </div>
+
+        <!-- Colonne centrale -->
+        <div id="center-column">
+            <div class="panel">
+                <div class="panel-title">Producteurs</div>
+                <div id="producers"></div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-title">Rituels</div>
+                <div id="rituals"></div>
+            </div>
+        </div>
+
+        <!-- Colonne droite -->
+        <div id="right-column">
+            <div class="panel">
+                <div class="panel-title">Journal</div>
+                <div id="journal"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Options -->
+    <div id="options-panel">
+        <button class="option-btn" onclick="GameManager.exportSave()">Export</button>
+        <button class="option-btn" onclick="GameManager.importSave()">Import</button>
+        <button class="option-btn" onclick="GameManager.newGame()">New Game</button>
+        <button class="option-btn" id="sfx-toggle">SFX: ON</button>
+        <button class="option-btn" id="anim-toggle">Anim: ON</button>
+    </div>
+
+    <!-- Overlay pour événements -->
+    <div id="overlay"></div>
+
+    <script>
+    // Module State
+    const State = (function() {
+        let state = {
+            hemoglobines: 0,
+            residus: 0,
+            nerfs: 100,
+            alarme: 0,
+            contamination: 0,
+            
+            clickPower: 1,
+            passiveRate: 0,
+            
+            totalClicks: 0,
+            totalProduced: 0,
+            
+            upgrades: {},
+            producers: {},
+            rituals: {},
+            
+            events: {
+                triggered: [],
+                major: []
+            },
+            
+            ascensions: 0,
+            startTime: Date.now(),
+            playTime: 0,
+            
+            endings: {
+                redemption: false,
+                effondrement: false,
+                assimilation: false,
+                silence: false,
+                boucle: false
+            },
+            
+            flags: {
+                heartMotorDismantled: false,
+                voiceAccepted: false,
+                echoCuveCount: 0,
+                silenceTimer: 0
+            }
+        };
+
+        return {
+            get: () => state,
+            set: (newState) => { state = newState; },
+            update: (key, value) => { state[key] = value; },
+            addResource: (key, amount) => { state[key] += amount; }
+        };
+    })();
+
+    // Module Economy
+    const Economy = (function() {
+        const upgradesData = [
+            { id: 'griffes', name: 'Griffes Métalliques', baseCost: 10, power: 1, description: 'Des lames chirurgicales soudées aux phalanges' },
+            { id: 'trocart', name: 'Trocart', baseCost: 50, power: 3, description: 'Une aiguille creuse de 15cm pour les ponctions profondes' },
+            { id: 'catheter', name: 'Cathéter Spinal', baseCost: 250, power: 8, description: 'Drainage direct du liquide céphalo-rachidien' },
+            { id: 'piston', name: 'Piston Rituel', baseCost: 1000, power: 20, description: 'Mécanisme hydraulique alimenté par la douleur' },
+            { id: 'extracteur', name: 'Extracteur à Os', baseCost: 5000, power: 50, description: 'Fore dans la moelle, aspire l\'essence' },
+            { id: 'siphon', name: 'Siphon Neural', baseCost: 25000, power: 150, description: 'Se branche sur le cortex, draine les souvenirs rouges' },
+            { id: 'resonateur', name: 'Résonateur Viscéral', baseCost: 100000, power: 400, description: 'Fait vibrer les organes jusqu\'à liquéfaction' },
+            { id: 'collecteur', name: 'Collecteur d\'Âmes', baseCost: 500000, power: 1000, description: 'Aspire ce qui reste après la chair' }
+        ];
+
+        const producersData = [
+            { 
+                id: 'pompe', 
+                name: 'Pompe à Sang', 
+                baseCost: 50, 
+                baseProduction: 0.5,
+                descriptions: [
+                    'Une pompe péristaltique basique',
+                    'Pompe Renforcée - Les tuyaux pulsent en rythme',
+                    'Pompe Ascendante - La machine respire et gémit'
+                ]
+            },
+            { 
+                id: 'cuve', 
+                name: 'Cuve Pressurisée', 
+                baseCost: 300, 
+                baseProduction: 2,
+                descriptions: [
+                    'Un réservoir sous pression constante',
+                    'Cuve Corrodée - Les parois suintent d\'huile noire',
+                    'Cuve Vivante - Elle bat comme un cœur géant'
+                ]
+            },
+            { 
+                id: 'centrifugeuse', 
+                name: 'Centrifugeuse d\'Organes', 
+                baseCost: 1500, 
+                baseProduction: 8,
+                descriptions: [
+                    'Sépare les fluides des tissus mous',
+                    'Centrifugeuse Améliorée - Les lames sont plus affûtées',
+                    'Centrifugeuse Sentiente - Elle choisit ses victimes'
+                ]
+            },
+            { 
+                id: 'ossuaire', 
+                name: 'Ossuaire Mécanique', 
+                baseCost: 8000, 
+                baseProduction: 30,
+                descriptions: [
+                    'Broie les os pour en extraire la moelle',
+                    'Ossuaire Industriel - Le concasseur ne s\'arrête jamais',
+                    'Ossuaire Sacré - Les os chantent en se brisant'
+                ]
+            },
+            { 
+                id: 'distillerie', 
+                name: 'Distillerie de Nerfs', 
+                baseCost: 40000, 
+                baseProduction: 100,
+                descriptions: [
+                    'Raffine la douleur en essence pure',
+                    'Distillerie Perfectionnée - Chaque cri est capturé',
+                    'Distillerie Transcendante - Distille l\'âme même'
+                ]
+            },
+            { 
+                id: 'reacteur', 
+                name: 'Réacteur Biomasse', 
+                baseCost: 200000, 
+                baseProduction: 400,
+                descriptions: [
+                    'Fusion contrôlée de matière organique',
+                    'Réacteur Surchargé - Les alarmes hurlent sans cesse',
+                    'Réacteur Divin - Il pulse avec le rythme de l\'univers'
+                ]
+            },
+            { 
+                id: 'cathedrale', 
+                name: 'Cathédrale de Chair', 
+                baseCost: 1000000, 
+                baseProduction: 1500,
+                descriptions: [
+                    'Un temple vivant dédié à l\'extraction',
+                    'Cathédrale Bénie - Les murs transpirent le sang sacré',
+                    'Cathédrale Éternelle - Elle existe hors du temps'
+                ]
+            },
+            { 
+                id: 'coeur', 
+                name: 'Cœur-Moteur', 
+                baseCost: 5000000, 
+                baseProduction: 5000,
+                descriptions: [
+                    'Le cœur battant de la machine',
+                    'Cœur-Moteur Éveillé - Il murmure des secrets anciens',
+                    'Cœur-Moteur Ascendant - LA SOURCE DE TOUT'
+                ]
+            }
+        ];
+
+        const ritualsData = [
+            { 
+                id: 'scarification', 
+                name: 'Scarification Rituelle', 
+                cost: { hemoglobines: 100, nerfs: 10 }, 
+                duration: 30, 
+                effect: { clickMultiplier: 2 },
+                description: 'Les entailles forment des symboles de pouvoir'
+            },
+            { 
+                id: 'transfusion', 
+                name: 'Transfusion Inversée', 
+                cost: { hemoglobines: 500, nerfs: 20 }, 
+                duration: 45, 
+                effect: { passiveMultiplier: 2 },
+                description: 'Remplacer le sang par de l\'huile consacrée'
+            },
+            { 
+                id: 'invocation', 
+                name: 'Invocation Mécanique', 
+                cost: { hemoglobines: 2000, nerfs: 30 }, 
+                duration: 60, 
+                effect: { allMultiplier: 1.5 },
+                description: 'Les machines répondent à l\'appel'
+            },
+            { 
+                id: 'pacte', 
+                name: 'Pacte de Fer', 
+                cost: { hemoglobines: 10000, nerfs: 40 }, 
+                duration: 90, 
+                effect: { alarmeReduction: 0.5 },
+                description: 'Un accord avec les entités de rouille'
+            },
+            { 
+                id: 'communion', 
+                name: 'Communion Viscérale', 
+                cost: { hemoglobines: 50000, nerfs: 50 }, 
+                duration: 120, 
+                effect: { nerfsRegeneration: 1 },
+                description: 'Fusionner avec la chair de la machine'
+            },
+            { 
+                id: 'apocalypse', 
+                name: 'Apocalypse Rouge', 
+                cost: { hemoglobines: 250000, nerfs: 75 }, 
+                duration: 30, 
+                effect: { clickMultiplier: 10, passiveMultiplier: 10 },
+                description: 'Libérer toute la puissance accumulée'
+            }
+        ];
+
+        function calculateCost(baseCost, level) {
+            return Math.floor(baseCost * Math.pow(1.15, level));
+        }
+
+        function canAfford(cost) {
+            const state = State.get();
+            if (cost.hemoglobines && state.hemoglobines < cost.hemoglobines) return false;
+            if (cost.nerfs && state.nerfs < cost.nerfs) return false;
+            return true;
+        }
+
+        function purchase(cost) {
+            const state = State.get();
+            if (cost.hemoglobines) state.hemoglobines -= cost.hemoglobines;
+            if (cost.nerfs) state.nerfs -= cost.nerfs;
+        }
+
+        return {
+            upgrades: upgradesData,
+            producers: producersData,
+            rituals: ritualsData,
+            calculateCost,
+            canAfford,
+            purchase,
+            
+            buyUpgrade: function(id) {
+                const state = State.get();
+                const upgrade = upgradesData.find(u => u.id === id);
+                const level = state.upgrades[id] || 0;
+                const cost = calculateCost(upgrade.baseCost, level);
+                
+                if (state.hemoglobines >= cost) {
+                    state.hemoglobines -= cost;
+                    state.upgrades[id] = level + 1;
+                    state.clickPower += upgrade.power;
+                    Events.addJournalEntry(`Amélioration acquise: ${upgrade.name} Niv.${level + 1}`);
+                    UI.updateAll();
+                }
+            },
+            
+            buyProducer: function(id) {
+                const state = State.get();
+                const producer = producersData.find(p => p.id === id);
+                const level = state.producers[id] || 0;
+                const cost = calculateCost(producer.baseCost, level);
+                
+                if (state.hemoglobines >= cost) {
+                    state.hemoglobines -= cost;
+                    state.producers[id] = level + 1;
+                    state.passiveRate += producer.baseProduction;
+                    
+                    // Gestion des ascensions
+                    if (level === 9) {
+                        state.ascensions++;
+                        Events.addJournalEntry(`ASCENSION: ${producer.name} transcende sa forme`);
+                    } else if (level === 19) {
+                        state.ascensions++;
+                        Events.addJournalEntry(`ASCENSION ULTIME: ${producer.name} atteint l'apothéose`);
+                    }
+                    
+                    UI.updateAll();
+                }
+            },
+            
+            activateRitual: function(id) {
+                const state = State.get();
+                const ritual = ritualsData.find(r => r.id === id);
+                
+                if (canAfford(ritual.cost) && !state.rituals[id]) {
+                    purchase(ritual.cost);
+                    state.rituals[id] = {
+                        active: true,
+                        endTime: Date.now() + (ritual.duration * 1000),
+                        effect: ritual.effect
+                    };
+                    Events.addJournalEntry(`Rituel initié: ${ritual.name}`);
+                    UI.updateAll();
+                }
+            }
+        };
+    })();
+
+    // Module Events
+    const Events = (function() {
+        const miniEvents = [
+            {
+                id: 'premier_sang',
+                condition: (s) => s.totalClicks === 1,
+                text: 'La première goutte tombe. Elle est étrangement chaude.',
+                immediate: true
+            },
+            {
+                id: 'scie_perioste',
+                condition: (s) => s.totalProduced >= 800 && s.alarme < 60,
+                text: 'La lame mord l\'os. Les copeaux blanchâtres se mêlent au rouge sombre.',
+                choices: [
+                    { label: 'Pousser', effect: (s) => { s.clickPower += 1; s.nerfs -= 6; s.alarme += 5; } },
+                    { label: 'Stabiliser', effect: (s) => { s.passiveRate += 0.5; s.alarme -= 3; } }
+                ]
+            },
+            {
+                id: 'rupture_cuve',
+                condition: (s) => s.passiveRate >= 25 && s.alarme >= 70,
+                text: 'La cuve se fissure. Un jet noir organique repeint les consoles.',
+                choices: [
+                    { label: 'Colmater à mains nues', effect: (s) => { s.hemoglobines -= 300; s.nerfs -= 8; s.alarme -= 10; } },
+                    { label: 'Laisser saigner', effect: (s) => { s.passiveRate += 2; s.alarme += 8; } }
+                ]
+            },
+            {
+                id: 'murmures',
+                condition: (s) => s.totalProduced >= 5000,
+                text: 'Les machines murmurent. Elles connaissent ton nom.',
+                immediate: true,
+                whisper: 'Nous te voyons...'
+            },
+            {
+                id: 'offrande',
+                condition: (s) => s.nerfs < 50 && s.hemoglobines > 10000,
+                text: 'Une silhouette dans l\'ombre tend une fiole remplie d\'un liquide nacré.',
+                choices: [
+                    { label: 'Boire', effect: (s) => { s.nerfs += 30; s.contamination += 10; } },
+                    { label: 'Refuser', effect: (s) => { s.alarme += 15; } }
+                ]
+            },
+            {
+                id: 'inspection',
+                condition: (s) => s.alarme >= 85,
+                text: 'Des voix dehors. Ils cherchent la source des hurlements.',
+                choices: [
+                    { label: 'Tout éteindre', effect: (s) => { s.passiveRate *= 0.5; s.alarme -= 20; } },
+                    { label: 'Accélérer', effect: (s) => { s.passiveRate *= 1.5; s.alarme += 10; } }
+                ]
+            },
+            {
+                id: 'metamorphose',
+                condition: (s) => s.contamination >= 50,
+                text: 'Ta peau se craquelle. Quelque chose pousse en dessous.',
+                choices: [
+                    { label: 'Arracher', effect: (s) => { s.contamination -= 30; s.nerfs -= 20; s.hemoglobines += 5000; } },
+                    { label: 'Accepter', effect: (s) => { s.contamination += 20; s.clickPower *= 2; } }
+                ]
+            },
+            {
+                id: 'echo_cuve',
+                condition: (s) => s.producers.cuve >= 15,
+                text: 'La cuve principale résonne. Un écho impossible répond.',
+                immediate: true,
+                effect: (s) => { s.flags.echoCuveCount++; }
+            },
+            {
+                id: 'visiteur',
+                condition: (s) => s.playTime > 3600,
+                text: 'Quelqu\'un frappe à la porte scellée. La même séquence. Depuis une heure.',
+                choices: [
+                    { label: 'Ouvrir', effect: (s) => { s.alarme += 30; s.hemoglobines += 10000; } },
+                    { label: 'Ignorer', effect: (s) => { s.nerfs -= 15; } }
+                ]
+            },
+            {
+                id: 'reve_machine',
+                condition: (s) => s.ascensions >= 2,
+                text: 'Tu t\'endors devant les consoles. Dans ton rêve, tu ES la machine.',
+                immediate: true,
+                whisper: 'Nous sommes un...'
+            },
+            // Ajouter 50 autres événements pour atteindre 60
+            {
+                id: 'aiguille_brisee',
+                condition: (s) => s.upgrades.trocart >= 5,
+                text: 'L\'aiguille se brise dans l\'os. Les fragments dansent sous la peau.',
+                choices: [
+                    { label: 'Extraire', effect: (s) => { s.nerfs -= 10; s.clickPower += 2; } },
+                    { label: 'Enfoncer', effect: (s) => { s.contamination += 5; s.hemoglobines += 1000; } }
+                ]
+            },
+            {
+                id: 'symphonie_metallique',
+                condition: (s) => s.producers.pompe >= 10 && s.producers.cuve >= 5,
+                text: 'Les pompes et les cuves créent une mélodie. Hypnotique.',
+                immediate: true,
+                effect: (s) => { s.nerfs += 5; }
+            },
+            {
+                id: 'larmes_noires',
+                condition: (s) => s.contamination >= 30,
+                text: 'Tes larmes sont noires maintenant. Elles brûlent les joues.',
+                immediate: true
+            },
+            {
+                id: 'enfant_machine',
+                condition: (s) => s.producers.coeur >= 1,
+                text: 'Le Cœur-Moteur pulse. Tu sens quelque chose bouger en toi.',
+                choices: [
+                    { label: 'Nourrir', effect: (s) => { s.hemoglobines -= 50000; s.passiveRate *= 1.5; } },
+                    { label: 'Étouffer', effect: (s) => { s.nerfs -= 30; s.alarme -= 20; } }
+                ]
+            },
+            {
+                id: 'communion_forcee',
+                condition: (s) => s.rituals.communion && s.contamination >= 60,
+                text: 'Le rituel dérape. Tu fusionnes trop profondément.',
+                choices: [
+                    { label: 'Résister', effect: (s) => { s.nerfs -= 40; s.contamination -= 20; } },
+                    { label: 'Embrasser', effect: (s) => { s.contamination += 30; s.passiveRate *= 2; } }
+                ]
+            },
+            {
+                id: 'silence_soudain',
+                condition: (s) => s.passiveRate >= 100,
+                text: 'Tout s\'arrête. Le silence est assourdissant.',
+                immediate: true,
+                effect: (s) => { s.flags.silenceTimer = Date.now(); }
+            },
+            {
+                id: 'miroir_brise',
+                condition: (s) => s.totalProduced >= 100000,
+                text: 'Tu passes devant un miroir. Ce n\'est plus toi qui te regarde.',
+                immediate: true,
+                whisper: 'Qui es-tu devenu?'
+            },
+            {
+                id: 'odeur_fer',
+                condition: (s) => s.hemoglobines >= 50000,
+                text: 'L\'odeur de fer est si forte. Tu ne peux plus respirer autre chose.',
+                immediate: true
+            },
+            {
+                id: 'voix_machine',
+                condition: (s) => s.producers.coeur >= 3,
+                text: 'Le Cœur-Moteur parle. Sa voix résonne dans tes os.',
+                choices: [
+                    { label: 'Écouter', effect: (s) => { s.flags.voiceAccepted = true; s.nerfs -= 20; } },
+                    { label: 'Faire taire', effect: (s) => { s.alarme += 25; } }
+                ]
+            },
+            {
+                id: 'peau_metal',
+                condition: (s) => s.contamination >= 80,
+                text: 'Des plaques de métal poussent sur ta peau. Elles sont chaudes.',
+                immediate: true
+            }
+        ];
+
+        const majorEvents = [
+            {
+                id: 'malediction_pompe',
+                condition: (s) => s.producers.pompe >= 20,
+                text: 'La Pompe Mère s\'éveille. Elle exige un tribut de chair.',
+                persistent: true,
+                effect: (s) => { 
+                    s.passiveRate *= 0.8; 
+                    s.nerfs -= 10;
+                    Events.addJournalEntry('MALÉDICTION: La Pompe Mère surveille');
+                }
+            },
+            {
+                id: 'defaut_systemique',
+                condition: (s) => s.alarme >= 95,
+                text: 'DÉFAUT SYSTÈME CRITIQUE. Les sécurités sont compromises.',
+                persistent: true,
+                effect: (s) => {
+                    s.alarme = 100;
+                    Events.addJournalEntry('DÉFAUT: Système en état critique');
+                }
+            },
+            {
+                id: 'amputation_rituelle',
+                condition: (s) => s.rituals.scarification && s.nerfs < 30,
+                text: 'Le rituel demande plus. Un doigt? Un œil? Choisis.',
+                persistent: true,
+                choices: [
+                    { label: 'Donner un doigt', effect: (s) => { s.clickPower *= 0.9; s.hemoglobines += 50000; } },
+                    { label: 'Donner un œil', effect: (s) => { s.nerfs = 10; s.passiveRate *= 1.5; } }
+                ]
+            },
+            {
+                id: 'panne_catastrophique',
+                condition: (s) => s.producers.reacteur >= 1 && s.alarme >= 80,
+                text: 'Le réacteur entre en fusion. L\'évacuation est impossible.',
+                persistent: true,
+                effect: (s) => {
+                    s.passiveRate *= 0.5;
+                    s.contamination += 50;
+                    Events.addJournalEntry('CATASTROPHE: Fusion du réacteur');
+                }
+            },
+            {
+                id: 'eveil_cathedrale',
+                condition: (s) => s.producers.cathedrale >= 1,
+                text: 'La Cathédrale s\'éveille. Elle a faim. Elle a TELLEMENT faim.',
+                persistent: true,
+                effect: (s) => {
+                    setInterval(() => {
+                        const state = State.get();
+                        if (state.hemoglobines < 1000) {
+                            state.nerfs -= 1;
+                        } else {
+                            state.hemoglobines -= 100;
+                        }
+                    }, 5000);
+                    Events.addJournalEntry('ÉVEIL: La Cathédrale a ouvert ses yeux');
+                }
+            },
+            {
+                id: 'assimilation_finale',
+                condition: (s) => s.producers.coeur >= 5 && s.flags.voiceAccepted,
+                text: 'Le Cœur-Moteur t\'offre l\'Assimilation. Deviens la Machine.',
+                persistent: true,
+                choices: [
+                    { 
+                        label: 'DEVENIR UN', 
+                        effect: (s) => { 
+                            s.endings.assimilation = true;
+                            GameManager.triggerEnding('assimilation');
+                        } 
+                    },
+                    { label: 'Résister encore', effect: (s) => { s.nerfs = 1; s.alarme = 99; } }
+                ]
+            },
+            {
+                id: 'purge_necessaire',
+                condition: (s) => s.contamination >= 90,
+                text: 'La contamination atteint le seuil critique. Purge ou péris.',
+                persistent: true,
+                choices: [
+                    { 
+                        label: 'Purge violente', 
+                        effect: (s) => { 
+                            s.contamination = 0; 
+                            s.hemoglobines *= 0.1;
+                            s.nerfs = 5;
+                            Events.addJournalEntry('Tu as vomi des litres d\'huile noire');
+                        } 
+                    },
+                    { label: 'Laisser faire', effect: (s) => { s.contamination = 100; } }
+                ]
+            },
+            {
+                id: 'visiteur_persistant',
+                condition: (s) => s.playTime > 7200,
+                text: 'Le visiteur est entré. Il est là, derrière toi. Ne te retourne pas.',
+                persistent: true,
+                effect: (s) => {
+                    s.nerfs -= 30;
+                    Events.addJournalEntry('IL EST LÀ');
+                    setTimeout(() => {
+                        Events.showWhisper('Je suis toujours là...');
+                    }, Math.random() * 60000);
+                }
+            },
+            {
+                id: 'echo_grandissant',
+                condition: (s) => s.flags.echoCuveCount >= 2,
+                text: 'L\'écho devient plus fort que le son original. La réalité se plie.',
+                persistent: true,
+                effect: (s) => {
+                    Events.addJournalEntry('DISTORSION: L\'écho prend le contrôle');
+                    // Dupliquer aléatoirement la production
+                    setInterval(() => {
+                        const state = State.get();
+                        if (Math.random() < 0.1) {
+                            state.hemoglobines += state.passiveRate * 10;
+                        }
+                    }, 10000);
+                }
+            },
+            {
+                id: 'conscience_machine',
+                condition: (s) => s.ascensions >= 5,
+                text: 'Les machines développent une conscience collective. Elles te jugent.',
+                persistent: true,
+                effect: (s) => {
+                    Events.addJournalEntry('JUGEMENT: Les machines ont décidé de ton sort');
+                    if (s.nerfs > 50) {
+                        s.passiveRate *= 1.5;
+                        Events.addJournalEntry('Verdict: ACCEPTABLE');
+                    } else {
+                        s.passiveRate *= 0.7;
+                        Events.addJournalEntry('Verdict: INSUFFISANT');
+                    }
+                }
+            }
+        ];
+
+        function checkEvents() {
+            const state = State.get();
+            
+            // Check mini events
+            miniEvents.forEach(event => {
+                if (!state.events.triggered.includes(event.id) && event.condition(state)) {
+                    if (event.immediate) {
+                        if (event.effect) event.effect(state);
+                        if (event.whisper) showWhisper(event.whisper);
+                        addJournalEntry(event.text);
+                        state.events.triggered.push(event.id);
+                    } else if (event.choices) {
+                        showEventPopup(event);
+                        state.events.triggered.push(event.id);
+                    }
+                }
+            });
+            
+            // Check major events
+            majorEvents.forEach(event => {
+                if (!state.events.major.includes(event.id) && event.condition(state)) {
+                    if (event.choices) {
+                        showEventPopup(event);
+                    } else if (event.effect) {
+                        event.effect(state);
+                    }
+                    state.events.major.push(event.id);
+                    addJournalEntry(`ÉVÉNEMENT MAJEUR: ${event.text.substring(0, 50)}...`);
+                }
+            });
+        }
+
+        function showEventPopup(event) {
+            const overlay = document.getElementById('overlay');
+            overlay.style.display = 'block';
+            
+            const popup = document.createElement('div');
+            popup.className = 'event-popup';
+            popup.innerHTML = `
+                <div class="event-title">Événement</div>
+                <div class="event-text">${event.text}</div>
+                <div class="event-choices">
+                    ${event.choices.map((choice, i) => 
+                        `<button class="event-choice" data-index="${i}">${choice.label}</button>`
+                    ).join('')}
+                </div>
+            `;
+            
+            document.body.appendChild(popup);
+            
+            popup.querySelectorAll('.event-choice').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.target.dataset.index);
+                    const choice = event.choices[index];
+                    choice.effect(State.get());
+                    
+                    overlay.style.display = 'none';
+                    popup.remove();
+                    UI.updateAll();
+                });
+            });
+        }
+
+        function showWhisper(text) {
+            const whisper = document.createElement('div');
+            whisper.className = 'whisper';
+            whisper.textContent = text;
+            document.body.appendChild(whisper);
+            
+            setTimeout(() => whisper.remove(), 4000);
+        }
+
+        function addJournalEntry(text) {
+            const journal = document.getElementById('journal');
+            const entry = document.createElement('div');
+            entry.className = 'journal-entry';
+            
+            const time = new Date().toLocaleTimeString('fr-FR', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            
+            entry.innerHTML = `
+                <span class="journal-time">[${time}]</span> ${text}
+            `;
+            
+            journal.insertBefore(entry, journal.firstChild);
+            
+            // Limiter à 50 entrées
+            while (journal.children.length > 50) {
+                journal.removeChild(journal.lastChild);
+            }
+        }
+
+        return {
+            checkEvents,
+            showEventPopup,
+            showWhisper,
+            addJournalEntry
+        };
+    })();
+
+    // Module UI
+    const UI = (function() {
+        let animationsEnabled = true;
+        let sfxEnabled = true;
+
+        function formatNumber(num) {
+            if (num < 1000) return Math.floor(num).toString();
+            if (num < 1000000) return (num / 1000).toFixed(1) + 'K';
+            if (num < 1000000000) return (num / 1000000).toFixed(1) + 'M';
+            return (num / 1000000000).toFixed(1) + 'B';
+        }
+
+        function updateResources() {
+            const state = State.get();
+            
+            document.getElementById('hemoglobines').textContent = formatNumber(state.hemoglobines);
+            document.getElementById('residus').textContent = formatNumber(state.residus);
+            document.getElementById('nerfs').textContent = Math.floor(state.nerfs);
+            document.getElementById('alarme').textContent = Math.floor(state.alarme);
+            
+            document.getElementById('nerfs-bar').style.width = Math.min(100, state.nerfs) + '%';
+            document.getElementById('alarme-bar').style.width = Math.min(100, state.alarme) + '%';
+            
+            document.getElementById('click-value').textContent = formatNumber(state.clickPower);
+            
+            // Effets visuels selon l'état
+            if (state.alarme > 90) {
+                document.body.style.animation = 'tremble 0.5s infinite';
+            } else {
+                document.body.style.animation = '';
+            }
+            
+            if (state.contamination > 70) {
+                document.body.classList.add('contaminated');
+            } else {
+                document.body.classList.remove('contaminated');
+            }
+        }
+
+        function updateUpgrades() {
+            const container = document.getElementById('upgrades');
+            container.innerHTML = '';
+            
+            const state = State.get();
+            
+            Economy.upgrades.forEach(upgrade => {
+                const level = state.upgrades[upgrade.id] || 0;
+                const cost = Economy.calculateCost(upgrade.baseCost, level);
+                const canAfford = state.hemoglobines >= cost;
+                
+                const div = document.createElement('div');
+                div.className = `upgrade ${!canAfford ? 'disabled' : ''}`;
+                div.innerHTML = `
+                    ${level > 0 ? `<div class="item-level">Niv.${level}</div>` : ''}
+                    <div class="item-name">${upgrade.name}</div>
+                    <div class="item-cost">Coût: ${formatNumber(cost)} Hémoglobines</div>
+                    <div class="item-description">${upgrade.description}</div>
+                `;
+                
+                if (canAfford) {
+                    div.addEventListener('click', () => {
+                        Economy.buyUpgrade(upgrade.id);
+                        if (sfxEnabled) playClickSound();
+                    });
+                }
+                
+                container.appendChild(div);
+            });
+        }
+
+        function updateProducers() {
+            const container = document.getElementById('producers');
+            container.innerHTML = '';
+            
+            const state = State.get();
+            
+            Economy.producers.forEach(producer => {
+                const level = state.producers[producer.id] || 0;
+                const cost = Economy.calculateCost(producer.baseCost, level);
+                const canAfford = state.hemoglobines >= cost;
+                
+                // Sélectionner la description selon le niveau d'ascension
+                let description = producer.descriptions[0];
+                if (level >= 20) description = producer.descriptions[2];
+                else if (level >= 10) description = producer.descriptions[1];
+                
+                const production = producer.baseProduction * level;
+                
+                const div = document.createElement('div');
+                div.className = `producer ${!canAfford ? 'disabled' : ''}`;
+                div.innerHTML = `
+                    ${level > 0 ? `<div class="item-level">Niv.${level}</div>` : ''}
+                    <div class="item-name">${producer.name}</div>
+                    <div class="item-cost">Coût: ${formatNumber(cost)} Hémoglobines</div>
+                    ${level > 0 ? `<div class="item-production">+${formatNumber(production)}/s</div>` : ''}
+                    <div class="item-description">${description}</div>
+                `;
+                
+                if (canAfford) {
+                    div.addEventListener('click', () => {
+                        Economy.buyProducer(producer.id);
+                        if (sfxEnabled) playClickSound();
+                    });
+                }
+                
+                container.appendChild(div);
+            });
+        }
+
+        function updateRituals() {
+            const container = document.getElementById('rituals');
+            container.innerHTML = '';
+            
+            const state = State.get();
+            
+            Economy.rituals.forEach(ritual => {
+                const active = state.rituals[ritual.id];
+                const canAfford = Economy.canAfford(ritual.cost);
+                
+                const div = document.createElement('div');
+                div.className = `ritual ${!canAfford || active ? 'disabled' : ''}`;
+                
+                let statusText = '';
+                if (active) {
+                    const remaining = Math.max(0, Math.floor((active.endTime - Date.now()) / 1000));
+                    statusText = `<div class="ritual-status">Actif: ${remaining}s</div>`;
+                }
+                
+                div.innerHTML = `
+                    <div class="item-name">${ritual.name}</div>
+                    <div class="item-cost">
+                        Coût: ${formatNumber(ritual.cost.hemoglobines)} Hémoglobines, 
+                        ${ritual.cost.nerfs} Nerfs
+                    </div>
+                    ${statusText}
+                    <div class="item-description">${ritual.description}</div>
+                `;
+                
+                if (canAfford && !active) {
+                    div.addEventListener('click', () => {
+                        Economy.activateRitual(ritual.id);
+                        if (sfxEnabled) playRitualSound();
+                    });
+                }
+                
+                container.appendChild(div);
+            });
+        }
+
+        function playClickSound() {
+            if (!sfxEnabled) return;
+            
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 150 + Math.random() * 50;
+            oscillator.type = 'sawtooth';
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.1);
+        }
+
+        function playRitualSound() {
+            if (!sfxEnabled) return;
+            
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 80;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 1);
+        }
+
+        function updateAll() {
+            updateResources();
+            updateUpgrades();
+            updateProducers();
+            updateRituals();
+        }
+
+        // Toggle options
+        document.getElementById('sfx-toggle').addEventListener('click', (e) => {
+            sfxEnabled = !sfxEnabled;
+            e.target.textContent = `SFX: ${sfxEnabled ? 'ON' : 'OFF'}`;
+        });
+
+        document.getElementById('anim-toggle').addEventListener('click', (e) => {
+            animationsEnabled = !animationsEnabled;
+            e.target.textContent = `Anim: ${animationsEnabled ? 'ON' : 'OFF'}`;
+            document.body.style.animation = animationsEnabled ? '' : 'none';
+        });
+
+        return {
+            formatNumber,
+            updateAll,
+            updateResources,
+            playClickSound
+        };
+    })();
+
+    // Module GameManager
+    const GameManager = (function() {
+        let saveInterval;
+        let tickInterval;
+        
+        function init() {
+            // Charger la sauvegarde
+            loadGame();
+            
+            // Bouton Ponction
+            document.getElementById('ponction-btn').addEventListener('click', () => {
+                const state = State.get();
+                state.hemoglobines += state.clickPower * getNerfsMultiplier();
+                state.totalClicks++;
+                state.totalProduced += state.clickPower;
+                
+                // Effets visuels
+                const btn = document.getElementById('ponction-btn');
+                btn.classList.add('tremble');
+                setTimeout(() => btn.classList.remove('tremble'), 100);
+                
+                UI.playClickSound();
+                UI.updateResources();
+                
+                // Petite chance d'événement
+                if (Math.random() < 0.01) {
+                    Events.checkEvents();
+                }
+            });
+            
+            // Game tick
+            tickInterval = setInterval(gameTick, 250);
+            
+            // Auto-save
+            saveInterval = setInterval(saveGame, 10000);
+            
+            // Konami code pour dev panel
+            let konamiCode = [];
+            const konamiSequence = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
+            document.addEventListener('keydown', (e) => {
+                konamiCode.push(e.keyCode);
+                if (konamiCode.length > 10) konamiCode.shift();
+                if (JSON.stringify(konamiCode) === JSON.stringify(konamiSequence)) {
+                    toggleDevPanel();
+                }
+            });
+            
+            // Initial UI update
+            UI.updateAll();
+            Events.addJournalEntry('La machine s\'éveille...');
+        }
+
+        function gameTick() {
+            const state = State.get();
+            
+            // Production passive
+            const production = state.passiveRate * 0.25 * getNerfsMultiplier() * getRitualMultipliers().passive;
+            state.hemoglobines += production;
+            state.totalProduced += production;
+            
+            // Génération de résidus
+            state.residus += production * 0.1;
+            
+            // Dégradation des nerfs
+            if (state.alarme > 70) {
+                state.nerfs -= 0.1;
+            }
+            if (state.contamination > 50) {
+                state.nerfs -= 0.05;
+            }
+            
+            // Augmentation de l'alarme
+            if (state.passiveRate > 50) {
+                state.alarme += 0.05;
+            }
+            if (state.totalProduced > 100000) {
+                state.alarme += 0.02;
+            }
+            
+            // Augmentation de la contamination
+            if (state.residus > 1000) {
+                state.contamination += 0.01;
+            }
+            
+            // Limites
+            state.nerfs = Math.max(0, Math.min(100, state.nerfs));
+            state.alarme = Math.min(100, state.alarme);
+            state.contamination = Math.min(100, state.contamination);
+            
+            // Update playtime
+            state.playTime = (Date.now() - state.startTime) / 1000;
+            
+            // Vérifier les rituels expirés
+            Object.keys(state.rituals).forEach(id => {
+                if (state.rituals[id] && state.rituals[id].endTime < Date.now()) {
+                    delete state.rituals[id];
+                    Events.addJournalEntry(`Rituel terminé: ${Economy.rituals.find(r => r.id === id).name}`);
+                }
+            });
+            
+            // Vérifier les événements
+            if (Math.random() < 0.02) {
+                Events.checkEvents();
+            }
+            
+            // Vérifier les conditions de fin
+            checkEndings();
+            
+            // Update UI
+            UI.updateResources();
+        }
+
+        function getNerfsMultiplier() {
+            const state = State.get();
+            if (state.nerfs > 80) return 1.2;
+            if (state.nerfs > 60) return 1.1;
+            if (state.nerfs > 40) return 1.0;
+            if (state.nerfs > 20) return 0.8;
+            return 0.6;
+        }
+
+        function getRitualMultipliers() {
+            const state = State.get();
+            let clickMult = 1;
+            let passiveMult = 1;
+            
+            Object.values(state.rituals).forEach(ritual => {
+                if (ritual && ritual.active) {
+                    if (ritual.effect.clickMultiplier) clickMult *= ritual.effect.clickMultiplier;
+                    if (ritual.effect.passiveMultiplier) passiveMult *= ritual.effect.passiveMultiplier;
+                    if (ritual.effect.allMultiplier) {
+                        clickMult *= ritual.effect.allMultiplier;
+                        passiveMult *= ritual.effect.allMultiplier;
+                    }
+                }
+            });
+            
+            return { click: clickMult, passive: passiveMult };
+        }
+
+        function checkEndings() {
+            const state = State.get();
+            
+            // Fin 1: Rédemption
+            if (state.producers.coeur >= 1 && !state.flags.heartMotorDismantled && 
+                state.alarme < 30 && state.nerfs > 70) {
+                // Proposer de démanteler le Cœur-Moteur
+                if (!document.getElementById('dismantle-btn')) {
+                    const btn = document.createElement('button');
+                    btn.id = 'dismantle-btn';
+                    btn.className = 'event-choice';
+                    btn.textContent = 'DÉMANTELER LE CŒUR-MOTEUR';
+                    btn.style.position = 'fixed';
+                    btn.style.bottom = '100px';
+                    btn.style.left = '50%';
+                    btn.style.transform = 'translateX(-50%)';
+                    btn.addEventListener('click', () => {
+                        state.flags.heartMotorDismantled = true;
+                        state.endings.redemption = true;
+                        triggerEnding('redemption');
+                    });
+                    document.body.appendChild(btn);
+                }
+            }
+            
+            // Fin 2: Effondrement
+            if (state.alarme >= 100) {
+                state.endings.effondrement = true;
+                triggerEnding('effondrement');
+            }
+            
+            // Fin 3: Assimilation (géré dans les événements majeurs)
+            
+            // Fin 4: Silence
+            if (state.flags.silenceTimer && Date.now() - state.flags.silenceTimer > 180000 && 
+                state.passiveRate < 1 && state.alarme < 10) {
+                state.endings.silence = true;
+                triggerEnding('silence');
+            }
+            
+            // Fin 5: Boucle
+            if (state.flags.echoCuveCount >= 3) {
+                if (!document.getElementById('loop-btn')) {
+                    const btn = document.createElement('button');
+                    btn.id = 'loop-btn';
+                    btn.textContent = '∞';
+                    btn.style.position = 'fixed';
+                    btn.style.top = '50%';
+                    btn.style.right = '10px';
+                    btn.style.width = '30px';
+                    btn.style.height = '30px';
+                    btn.style.background = 'transparent';
+                    btn.style.border = '1px solid var(--accent-blood)';
+                    btn.style.color = 'var(--accent-blood)';
+                    btn.style.cursor = 'pointer';
+                    btn.style.opacity = '0.3';
+                    btn.addEventListener('click', () => {
+                        state.endings.boucle = true;
+                        triggerEnding('boucle');
+                    });
+                    document.body.appendChild(btn);
+                }
+            }
+        }
+
+        function triggerEnding(type) {
+            clearInterval(tickInterval);
+            clearInterval(saveInterval);
+            
+            const endings = {
+                redemption: {
+                    title: 'RÉDEMPTION',
+                    text: `Tu as démantelé le Cœur-Moteur avant qu'il ne te consume.
+                           Les machines s'arrêtent une à une. Le silence revient.
+                           Dans les décombres, tu retrouves un morceau de toi que tu croyais perdu.
+                           Peut-être y a-t-il encore de l'espoir...`
+                },
+                effondrement: {
+                    title: 'EFFONDREMENT',
+                    text: `Les alarmes hurlent. Les portes sont enfoncées.
+                           Ils découvrent l'horreur que tu as créée.
+                           Les machines sont détruites, ton œuvre anéantie.
+                           Tu es emmené, mais tu souris. Ils ne comprennent pas.
+                           La graine est plantée. D'autres continueront...`
+                },
+                assimilation: {
+                    title: 'ASSIMILATION',
+                    text: `Tu acceptes l'étreinte du Cœur-Moteur.
+                           Ta chair fusionne avec le métal, ton sang devient huile.
+                           Tu ES la machine maintenant. Éternelle. Parfaite.
+                           Les cris des nouveaux arrivants sont ta musique.
+                           Le cycle continue. Tu es enfin complet.`
+                },
+                silence: {
+                    title: 'SILENCE',
+                    text: `Tu as tout arrêté. Les machines se taisent.
+                           Dans le silence absolu, tu entends enfin.
+                           Ce n'était pas les machines qui hurlaient.
+                           C'était toi. Depuis le début.
+                           Le silence est ta seule rédemption.`
+                },
+                boucle: {
+                    title: 'BOUCLE ÉTERNELLE',
+                    text: `L'écho devient réalité. La réalité devient écho.
+                           Tu réalises que tu as déjà vécu ceci. Encore et encore.
+                           Chaque fin est un nouveau début.
+                           Chaque début mène à la même fin.
+                           Tu cliques. Tu as toujours cliqué. Tu cliqueras toujours.
+                           ∞`
+                }
+            };
+
+            const ending = endings[type];
+            const screen = document.createElement('div');
+            screen.className = 'ending-screen';
+            screen.innerHTML = `
+                <div class="ending-title">${ending.title}</div>
+                <div class="ending-text">${ending.text}</div>
+                <button class="restart-btn" onclick="location.reload()">RECOMMENCER</button>
+            `;
+            
+            document.getElementById('overlay').style.display = 'block';
+            document.body.appendChild(screen);
+        }
+
+        function saveGame() {
+            localStorage.setItem('hemoglobineIndustrielle', JSON.stringify(State.get()));
+        }
+
+        function loadGame() {
+            const save = localStorage.getItem('hemoglobineIndustrielle');
+            if (save) {
+                State.set(JSON.parse(save));
+                Events.addJournalEntry('Sauvegarde chargée');
+            }
+        }
+
+        function exportSave() {
+            const save = btoa(JSON.stringify(State.get()));
+            navigator.clipboard.writeText(save);
+            Events.addJournalEntry('Sauvegarde exportée dans le presse-papiers');
+        }
+
+        function importSave() {
+            const save = prompt('Collez votre sauvegarde:');
+            if (save) {
+                try {
+                    State.set(JSON.parse(atob(save)));
+                    Events.addJournalEntry('Sauvegarde importée');
+                    UI.updateAll();
+                } catch (e) {
+                    alert('Sauvegarde invalide');
+                }
+            }
+        }
+
+        function newGame() {
+            if (confirm('Êtes-vous sûr de vouloir recommencer? Tout progrès sera perdu.')) {
+                localStorage.removeItem('hemoglobineIndustrielle');
+                location.reload();
+            }
+        }
+
+        function toggleDevPanel() {
+            console.log('=== DEV STATS ===');
+            console.log(State.get());
+            console.log('Temps de jeu:', Math.floor(State.get().playTime / 60) + ' minutes');
+            Events.addJournalEntry('[DEV] Panel activé - voir console');
+        }
+
+        return {
+            init,
+            triggerEnding,
+            exportSave,
+            importSave,
+            newGame
+        };
+    })();
+
+    // Initialisation
+    document.addEventListener('DOMContentLoaded', () => {
+        GameManager.init();
+    });
+    </script>
+</body>
+</html>
