@@ -1121,51 +1121,182 @@
             </button>
         </div>
     </section>
- <!-- vanne Section --> 
-    <script>
-        // Script pour la Boîte à Vannes
-        const roastBtn = document.getElementById('roastBtn');
-        const roastText = document.getElementById('roastText');
-        const roastIcon = document.getElementById('roastIcon');
+<!-- 
+===========================================
+SECTION VANNES AMÉLIORÉE
+===========================================
+Remplace l'ancienne section "roastSection" et son script par ce code.
+Les vannes sont maintenant :
+- Plus méchantes/piquantes
+- Mieux catégorisées
+- Sans répétition grâce au shuffle
+- Avec un compteur de trauma
+===========================================
+-->
 
-        const vannes = [
-            // Vannes sur l'âge (23 vs 25 ans) - Mode MILF/Boomer
-            "À 25 ans, fais attention à ton dos quand tu tatoues. C'est le début de la gériatrie. 👵",
-            "Moi : 23 ans, la jeunesse, l'avenir. <br>Toi : 25 ans, la sagesse ancestrale... et les premiers cheveux blancs ? 😏",
-            "C'est cool que tu sortes avec un mec de 23 ans. C'est important de rester connectée avec la jeunesse, Madame. 🍷",
-            "Fiona, 25 ans. Est-ce que tu veux que je t'aide à traverser la route ou ça va aller ?",
-            
-            // Vannes sur le côté Introvertie
-            "Niveau d'énergie sociale actuel : 4%. <br>Veuillez recharger Fiona avec du silence et des ténèbres.",
-            "Si tu pouvais tatouer les gens sans avoir à leur parler, ta vie serait parfaite, non ? 😶",
-            "Fiona dans un bar : *regarde son téléphone*. <br>Fiona à la salle : *regarde le sol*. <br>Fiona avec Yamy : *ne s'arrête jamais de parler*. ❤️",
-            "Ton super-pouvoir ? Disparaître dans un coin de la pièce dès qu'il y a plus de 3 humains.",
+<section class="boost-section" id="roastSection" style="margin-top: 50px;">
+    <div class="section-header">
+        <div class="section-tag">💀 DANGER ZONE</div>
+        <h2 class="section-title">La Boîte à Trauma</h2>
+    </div>
 
-            // Vannes sur le style Emo/Dark
-            "Si tu portes encore plus de noir, tu vas finir par absorber la lumière du soleil et provoquer une éclipse. 🌑",
-            "J'ai vérifié ton ADN : 50% Caféine, 50% Haine des gens, 100% Emo.",
-            "C'est pas une phase maman, c'est un lifestyle ! (Dit-elle avec ses tatouages incroyables).",
-            "Alerte : Une fille dark repérée sur un vélo de mamie à la salle. Crédibilité street : -1000. Mignonnerie : +10000."
-        ];
+    <div class="boost-card" style="border-color: var(--accent-pink);">
+        <div class="boost-icon" id="roastIcon">🎰</div>
+        <h3 class="boost-title">Vérités non-sollicitées</h3>
+        
+        <p class="boost-text" id="roastText" style="min-height: 100px; display: flex; align-items: center; justify-content: center; text-align: center;">
+            Tu cliques, tu assumes. Pas de remboursement émotionnel prévu.
+        </p>
+        
+        <div id="roastCounter" style="font-size: 0.7rem; color: var(--text-muted); margin-top: 15px; opacity: 0;">
+            Vannes encaissées : <span id="counter">0</span> 💔
+        </div>
+        
+        <button class="enter-btn" id="roastBtn" style="margin-top: 20px; font-size: 0.8rem; padding: 12px 25px; background: transparent; border: 1px solid var(--accent-pink); width: 100%;">
+            🎲 Tente ta chance (ou pas)
+        </button>
+    </div>
+</section>
 
-        roastBtn.addEventListener('click', () => {
-            // Effet de glitch avant d'afficher
-            roastText.style.opacity = 0;
-            roastIcon.innerHTML = "⚡";
-            
-            setTimeout(() => {
-                const randomVanne = vannes[Math.floor(Math.random() * vannes.length)];
-                roastText.innerHTML = randomVanne;
-                roastText.style.opacity = 1;
-                roastIcon.innerHTML = "😈";
-                
-                // Petit tremblement de l'écran pour l'impact
-                document.body.style.transform = "translateX(5px)";
-                setTimeout(() => document.body.style.transform = "translateX(-5px)", 50);
-                setTimeout(() => document.body.style.transform = "translate(0)", 100);
-            }, 300);
-        });
-    </script>
+<script>
+const roastBtn = document.getElementById('roastBtn');
+const roastText = document.getElementById('roastText');
+const roastIcon = document.getElementById('roastIcon');
+const roastCounter = document.getElementById('roastCounter');
+const counter = document.getElementById('counter');
+let clickCount = 0;
+
+const vannes = [
+    // === VANNES SUR L'ÂGE (la cougar de 25 ans) ===
+    "25 ans et tu sors avec un mec de 23 ans ? C'est beau de vouloir se sentir jeune. Tu veux que je te trouve une crème anti-rides aussi ? 👵",
+    
+    "T'as 25 ans, t'es officiellement plus proche de la trentaine que de ton adolescence. Bienvenue dans la décadence. 📉",
+    
+    "Moi à 23 ans : plein d'avenir.<br>Toi à 25 ans : plein de... souvenirs ? 💀",
+    
+    "C'est mignon que tu sortes avec quelqu'un de plus jeune. C'est pour te rappeler comment c'était d'avoir de l'énergie ?",
+    
+    "25 ans. L'âge où tu commences à faire 'aïe' en te levant du canapé. Courage. 🦴",
+
+    // === VANNES SUR L'INTROVERSION ===
+    "Ton idée d'une soirée parfaite c'est quand l'événement est annulé, avoue. 🏠",
+    
+    "T'as plus de conversations avec ton chat qu'avec des humains ce mois-ci. Et le chat en a marre aussi.",
+    
+    "Batterie sociale : 2%.<br>Envie de parler à des gens : -47%.<br>Envie de rentrer chez soi : toujours 100%.",
+    
+    "Tu réponds pas aux messages pendant 3 jours mais tu les as lus en 3 secondes. Psychopathe. 📱👀",
+    
+    "Ton cercle social est tellement petit qu'on peut même pas appeler ça un cercle. C'est un point. Un pixel. 🔴",
+
+    // === VANNES SUR LE STYLE EMO/DARK ===
+    "Tu portes tellement de noir que même ton aura est en deuil. De quoi ? On sait pas. Mais elle souffre. 🖤",
+    
+    "Ton Spotify Wrapped c'est juste une lettre de condoléances de la part de l'algorithme.",
+    
+    "T'es le genre de meuf à dire 'je vais bien' avec une playlist qui s'appelle 'suffering in silence vol.47'.",
+    
+    "Être emo en 2024 c'est vintage maintenant. T'es pas dark, t'es rétro. 📼",
+    
+    "Si t'étais une couleur tu serais pas noir. Tu serais 'absence de lumière et d'espoir'. Nuance.",
+
+    // === VANNES SUR LE TATTOO ===
+    "Tu veux devenir tatoueuse mais tu flippes de tatouer des gens.<br>C'est comme vouloir être chirurgien mais avoir peur du sang. Logique. 🧠",
+    
+    "Tes dessins sont incroyables.<br>Ta confiance en toi ? On cherche encore. Appel à témoins en cours. 🔍",
+    
+    "T'as le talent pour tatouer les stars.<br>T'as la confiance pour tatouer... personne pour l'instant. Baby steps. 👶",
+    
+    "Le syndrome de l'imposteur t'a tellement bien que tu lui paies un loyer.",
+
+    // === VANNES SUR LE VÉLO DE MAMIE ===
+    "Meuf dark et mystérieuse... qui débarque à la salle sur un vélo de 1987 avec un panier. L'intimidation a pris un coup. 🚲🧺",
+    
+    "T'arrives en mode 'je suis la nuit'... sur un vélo qui fait 'pouet pouet'. Le charisme en a pris un coup. 🤡",
+    
+    "On peut pas être crédible en emo quand ton moyen de transport a des fleurs sur le garde-boue. Sorry.",
+
+    // === VANNES SUR NOUS DEUX ===
+    "On s'envoie 400 messages par jour mais on 'prend notre temps'. On est pas pressés, on est juste accros. Nuance. 💀",
+    
+    "Toi : 'Je suis pas une fille à messages'.<br>Aussi toi : *triple texte à 3h du mat*. Mytho. 📲",
+    
+    "Notre relation c'est deux asociaux qui ont décidé d'être asociaux ensemble. C'est beau. C'est triste. C'est nous. 🖤",
+    
+    "T'as trouvé le seul mec qui parle autant que toi. Maintenant personne peut en placer une. On est deux bavards muets.",
+
+    // === VANNES BONUS SAVAGE ===
+    "Ton red flag préféré c'est toi-même et tu le sais. 🚩",
+    
+    "T'es le genre de meuf à ghoster quelqu'un et te demander pourquoi il répond plus. 🤔",
+    
+    "Ta zone de confort est tellement petite que même toi t'y rentres plus.",
+    
+    "Si l'auto-sabotage était un sport olympique, t'aurais l'or, l'argent ET le bronze. Polyvalente. 🏅",
+    
+    "T'es pas compliquée. T'es un escape game émotionnel niveau expert. 🔐"
+];
+
+// Mélanger le tableau pour éviter les répétitions
+let shuffledVannes = [...vannes].sort(() => Math.random() - 0.5);
+let vanneIndex = 0;
+
+roastBtn.addEventListener('click', () => {
+    // Reset si on a fait le tour
+    if (vanneIndex >= shuffledVannes.length) {
+        shuffledVannes = [...vannes].sort(() => Math.random() - 0.5);
+        vanneIndex = 0;
+    }
+    
+    // Animation de chargement
+    roastText.style.opacity = 0;
+    roastText.style.transform = 'scale(0.9)';
+    roastIcon.innerHTML = "💀";
+    roastBtn.disabled = true;
+    roastBtn.innerHTML = "⏳ Calcul du trauma...";
+    
+    setTimeout(() => {
+        roastText.innerHTML = shuffledVannes[vanneIndex];
+        roastText.style.opacity = 1;
+        roastText.style.transform = 'scale(1)';
+        roastIcon.innerHTML = "😈";
+        roastBtn.disabled = false;
+        roastBtn.innerHTML = "🎲 Encore un trauma";
+        
+        // Compteur
+        clickCount++;
+        vanneIndex++;
+        counter.textContent = clickCount;
+        roastCounter.style.opacity = 1;
+        
+        // Effet de secousse
+        const card = document.querySelector('#roastSection .boost-card');
+        card.style.animation = 'shake 0.5s ease';
+        setTimeout(() => card.style.animation = '', 500);
+        
+    }, 800);
+});
+
+// Ajouter l'animation shake dans le style
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+    
+    #roastText {
+        transition: all 0.3s ease;
+    }
+    
+    #roastBtn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+`;
+document.head.appendChild(style);
+</script>
     <!-- Gallery Section -->
     <section class="gallery-section" id="gallerySection">
         <div class="section-header">
