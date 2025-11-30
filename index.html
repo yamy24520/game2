@@ -1146,88 +1146,94 @@ const counter = document.getElementById('counter');
 let clickCount = 0;
 
 const vannes = [
-    // === VANNES SUR L'ÂGE (la cougar de 25 ans) ===
-    "25 ans et tu sors avec un mec de 23 ans ? C'est beau de vouloir se sentir jeune. Tu veux que je te trouve une crème anti-rides aussi ? 👵",
+    // === LE MALAISE À 66KG (L'OR ABSOLU) ===
+    "66kg au tirage et t'as vu le paradis. Jésus t'a refusée à l'entrée, il a dit 'remonte, t'as pas fini ton set'. 💀",
     
-    "T'as 25 ans, t'es officiellement plus proche de la trentaine que de ton adolescence. Bienvenue dans la décadence. 📉",
+    "T'es la seule gothique qui a failli mourir... à cause d'une poulie. Même la mort a eu la flemme de te prendre. 🏋️‍♀️⚰️",
     
-    "Moi à 23 ans : plein d'avenir.<br>Toi à 25 ans : plein de... souvenirs ? 💀",
+    "66kg. Six. Six. Le chiffre du diable. Coïncidence ? Je pense pas. Satan t'a rappelée à l'ordre. 😈",
     
-    "C'est mignon que tu sortes avec quelqu'un de plus jeune. C'est pour te rappeler comment c'était d'avoir de l'énergie ?",
+    "Le tirage à 66kg t'a envoyée direct en spectator mode. Respawn dans 5 minutes.",
     
-    "25 ans. L'âge où tu commences à faire 'aïe' en te levant du canapé. Courage. 🦴",
+    "T'as fait un malaise à 66kg et moi je fais mes séries à... non rien, on parle de toi là. 👀",
+    
+    "Ton corps a littéralement fait ctrl+alt+suppr à 66 kilos. Blue screen of death version salle de sport.",
+    
+    "66kg et ton âme a quitté le chat. Ta gothic energy a ses limites apparemment. 🖤💨",
 
-    // === VANNES SUR L'INTROVERSION ===
-    "Ton idée d'une soirée parfaite c'est quand l'événement est annulé, avoue. 🏠",
+    // === VEGAN + SANS GLUTEN (DOUBLE COMBO) ===
+    "Vegan ET sans gluten ? Tu manges quoi concrètement ? De l'air ? Des pensées positives ? De la tristesse ? 🥗🚫",
     
-    "T'as plus de conversations avec ton chat qu'avec des humains ce mois-ci. Et le chat en a marre aussi.",
+    "T'es vegan, sans gluten, et gothique. T'as choisi la difficulté maximale dans les paramètres de vie. 🎮",
     
-    "Batterie sociale : 2%.<br>Envie de parler à des gens : -47%.<br>Envie de rentrer chez soi : toujours 100%.",
+    "Restaurant avec toi : 'Bonjour, vous avez de l'eau ? Sans gluten ? Et l'eau elle a souffert ou pas ?'",
     
-    "Tu réponds pas aux messages pendant 3 jours mais tu les as lus en 3 secondes. Psychopathe. 📱👀",
+    "Vegan sans gluten à un barbecue c'est comme un vampire à la plage. Tu fais quoi là exactement ? Tu regardes ? 🧛‍♀️🌭",
     
-    "Ton cercle social est tellement petit qu'on peut même pas appeler ça un cercle. C'est un point. Un pixel. 🔴",
+    "Ton corps rejette le gluten ET la viande. T'es sûre que t'es pas juste allergique au bonheur ? 🤔",
+    
+    "Même ton alimentation est dark. Tu manges que des trucs tristes et sans saveur. Cohérent avec le personnage.",
+    
+    "Vegan sans gluten et tu fais des malaises à la salle. Tu m'étonnes, ton corps tourne au jus de céleri. 🥬",
+    
+    "C'est pas un régime alimentaire que t'as, c'est une liste de choses que t'as le droit de regarder sans toucher.",
 
-    // === VANNES SUR LE STYLE EMO/DARK ===
-    "Tu portes tellement de noir que même ton aura est en deuil. De quoi ? On sait pas. Mais elle souffre. 🖤",
+    // === SOULÈVE PAS LOURD (sauf en fente bulgare) ===
+    "Forte en fente bulgare mais c'est tout. T'es comme un Pokémon avec une seule attaque. 🎴",
     
-    "Ton Spotify Wrapped c'est juste une lettre de condoléances de la part de l'algorithme.",
+    "Ton PR c'est en fente bulgare. Le seul exercice où tu peux faire semblant de fuir tes problèmes. 🏃‍♀️",
     
-    "T'es le genre de meuf à dire 'je vais bien' avec une playlist qui s'appelle 'suffering in silence vol.47'.",
+    "Tu soulèves pas lourd mais tu soulèves des questions existentielles. C'est déjà ça. 🤷‍♀️",
     
-    "Être emo en 2024 c'est vintage maintenant. T'es pas dark, t'es rétro. 📼",
+    "Tes haltères ont jamais vu un chiffre à deux caractères et c'est ok. Les roses c'est joli. 🌸",
     
-    "Si t'étais une couleur tu serais pas noir. Tu serais 'absence de lumière et d'espoir'. Nuance.",
+    "Queen des fentes bulgares mais dès qu'il faut pousser un truc... 'non mais je veux pas prendre de masse'. 💅",
+    
+    "T'es forte en fente bulgare parce que c'est le seul exo où tu peux souffrir de façon esthétique. Très gothique.",
 
-    // === VANNES SUR LE TATTOO ===
-    "Tu veux devenir tatoueuse mais tu flippes de tatouer des gens.<br>C'est comme vouloir être chirurgien mais avoir peur du sang. Logique. 🧠",
+    // === DIFFÉRENCE D'ÂGE (elle 25, moi 23) ===
+    "Tu sors avec un mec de 23 ans. C'est pour te sentir jeune ou c'est parce que ceux de ton âge veulent des trucs sérieux ? 👵💕",
     
-    "Tes dessins sont incroyables.<br>Ta confiance en toi ? On cherche encore. Appel à témoins en cours. 🔍",
+    "T'as 2 ans de plus que moi. Techniquement tu pourrais être ma babysitter. Appelle-moi 'petit'. 👶",
     
-    "T'as le talent pour tatouer les stars.<br>T'as la confiance pour tatouer... personne pour l'instant. Baby steps. 👶",
+    "J'ai 23 ans, toi 25. Quand j'avais 10 ans, t'en avais 12. Tu jouais déjà à la grande. Rien a changé. 😏",
     
-    "Le syndrome de l'imposteur t'a tellement bien que tu lui paies un loyer.",
+    "25 ans, vegan, sans gluten, gothique, fait des malaises à la salle. Pile au milieu de ta crise de quart de vie. 📊",
+    
+    "C'est mignon de sortir avec quelqu'un de plus jeune. Tu te sens comment, cougar ? 🐆",
 
-    // === VANNES SUR LE VÉLO DE MAMIE ===
-    "Meuf dark et mystérieuse... qui débarque à la salle sur un vélo de 1987 avec un panier. L'intimidation a pris un coup. 🚲🧺",
+    // === LE STYLE GOTHIQUE ===
+    "T'es gothique mais tu fais des malaises à 66kg. Marilyn Manson est déçu. 🎸",
     
-    "T'arrives en mode 'je suis la nuit'... sur un vélo qui fait 'pouet pouet'. Le charisme en a pris un coup. 🤡",
+    "Gothique, vegan, sans gluten. Si t'étais un starter pack, personne t'achèterait. Trop compliqué. 📦",
     
-    "On peut pas être crédible en emo quand ton moyen de transport a des fleurs sur le garde-boue. Sorry.",
+    "Ton esthétique dit 'je suis la nuit' mais ton corps dit 'je suis fragile donnez-moi du sucre'. 🌙🍬",
+    
+    "Gothique à la salle de sport c'est un oxymore. L'effort physique c'est trop mainstream pour vous non ? 🏋️‍♀️🖤",
+    
+    "Tu ressembles à quelqu'un qui pourrait invoquer un démon mais qui peut pas ouvrir un bocal de cornichons.",
 
-    // === VANNES SUR NOUS DEUX ===
-    "On s'envoie 400 messages par jour mais on 'prend notre temps'. On est pas pressés, on est juste accros. Nuance. 💀",
+    // === COMBO FATAL ===
+    "Récap : gothique, vegan, sans gluten, soulève pas lourd, fait des malaises. T'es un personnage créé avec les options les plus hardcore. 🎮",
     
-    "Toi : 'Je suis pas une fille à messages'.<br>Aussi toi : *triple texte à 3h du mat*. Mytho. 📲",
+    "T'es littéralement un boss de fin de niveau pour n'importe quel restaurateur et coach sportif.",
     
-    "Notre relation c'est deux asociaux qui ont décidé d'être asociaux ensemble. C'est beau. C'est triste. C'est nous. 🖤",
+    "Si ta vie était un jeu, le tuto dirait : 'Attention, difficulté EXTRÊME sélectionnée. Bonne chance.' ⚠️",
     
-    "T'as trouvé le seul mec qui parle autant que toi. Maintenant personne peut en placer une. On est deux bavards muets.",
-
-    // === VANNES BONUS SAVAGE ===
-    "Ton red flag préféré c'est toi-même et tu le sais. 🚩",
+    "66kg t'a mise KO mais tu fais des fentes bulgares comme une queen. Ton corps est aussi cohérent que ton régime. 🤡",
     
-    "T'es le genre de meuf à ghoster quelqu'un et te demander pourquoi il répond plus. 🤔",
-    
-    "Ta zone de confort est tellement petite que même toi t'y rentres plus.",
-    
-    "Si l'auto-sabotage était un sport olympique, t'aurais l'or, l'argent ET le bronze. Polyvalente. 🏅",
-    
-    "T'es pas compliquée. T'es un escape game émotionnel niveau expert. 🔐"
+    "Gothique qui mange que des légumes et qui s'évanouit à la salle. Ton énergie dark vient d'où exactement ? Du tofu ? 🖤🥦"
 ];
 
-// Mélanger le tableau pour éviter les répétitions
 let shuffledVannes = [...vannes].sort(() => Math.random() - 0.5);
 let vanneIndex = 0;
 
 roastBtn.addEventListener('click', () => {
-    // Reset si on a fait le tour
     if (vanneIndex >= shuffledVannes.length) {
         shuffledVannes = [...vannes].sort(() => Math.random() - 0.5);
         vanneIndex = 0;
     }
     
-    // Animation de chargement
     roastText.style.opacity = 0;
     roastText.style.transform = 'scale(0.9)';
     roastIcon.innerHTML = "💀";
@@ -1242,13 +1248,11 @@ roastBtn.addEventListener('click', () => {
         roastBtn.disabled = false;
         roastBtn.innerHTML = "🎲 Encore un trauma";
         
-        // Compteur
         clickCount++;
         vanneIndex++;
         counter.textContent = clickCount;
         roastCounter.style.opacity = 1;
         
-        // Effet de secousse
         const card = document.querySelector('#roastSection .boost-card');
         card.style.animation = 'shake 0.5s ease';
         setTimeout(() => card.style.animation = '', 500);
@@ -1256,7 +1260,6 @@ roastBtn.addEventListener('click', () => {
     }, 800);
 });
 
-// Ajouter l'animation shake dans le style
 const style = document.createElement('style');
 style.textContent = `
     @keyframes shake {
@@ -1264,15 +1267,8 @@ style.textContent = `
         10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
         20%, 40%, 60%, 80% { transform: translateX(5px); }
     }
-    
-    #roastText {
-        transition: all 0.3s ease;
-    }
-    
-    #roastBtn:disabled {
-        opacity: 0.7;
-        cursor: not-allowed;
-    }
+    #roastText { transition: all 0.3s ease; }
+    #roastBtn:disabled { opacity: 0.7; cursor: not-allowed; }
 `;
 document.head.appendChild(style);
 </script>
