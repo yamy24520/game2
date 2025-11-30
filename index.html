@@ -1101,6 +1101,71 @@
         </div>
     </section>
 
+
+    <section class="boost-section" id="roastSection" style="margin-top: 50px;">
+        <div class="section-header">
+            <div class="section-tag">💀 DANGER ZONE</div>
+            <h2 class="section-title">La Boîte à Maudites</h2>
+        </div>
+
+        <div class="boost-card" style="border-color: var(--accent-pink);">
+            <div class="boost-icon" id="roastIcon">🔮</div>
+            <h3 class="boost-title">Vérités qui piquent</h3>
+            
+            <p class="boost-text" id="roastText" style="min-height: 80px; display: flex; align-items: center; justify-content: center;">
+                Ose cliquer sur le bouton si tu as assez de confiance en toi... (Attention, l'IA est méchante).
+            </p>
+            
+            <button class="enter-btn" id="roastBtn" style="margin-top: 20px; font-size: 0.8rem; padding: 12px 25px; background: transparent; border: 1px solid var(--accent-pink); width: 100%;">
+                🎲 Générer une vanne gratuite
+            </button>
+        </div>
+    </section>
+ <!-- vanne Section --> 
+    <script>
+        // Script pour la Boîte à Vannes
+        const roastBtn = document.getElementById('roastBtn');
+        const roastText = document.getElementById('roastText');
+        const roastIcon = document.getElementById('roastIcon');
+
+        const vannes = [
+            // Vannes sur l'âge (23 vs 25 ans) - Mode MILF/Boomer
+            "À 25 ans, fais attention à ton dos quand tu tatoues. C'est le début de la gériatrie. 👵",
+            "Moi : 23 ans, la jeunesse, l'avenir. <br>Toi : 25 ans, la sagesse ancestrale... et les premiers cheveux blancs ? 😏",
+            "C'est cool que tu sortes avec un mec de 23 ans. C'est important de rester connectée avec la jeunesse, Madame. 🍷",
+            "Fiona, 25 ans. Est-ce que tu veux que je t'aide à traverser la route ou ça va aller ?",
+            
+            // Vannes sur le côté Introvertie
+            "Niveau d'énergie sociale actuel : 4%. <br>Veuillez recharger Fiona avec du silence et des ténèbres.",
+            "Si tu pouvais tatouer les gens sans avoir à leur parler, ta vie serait parfaite, non ? 😶",
+            "Fiona dans un bar : *regarde son téléphone*. <br>Fiona à la salle : *regarde le sol*. <br>Fiona avec Yamy : *ne s'arrête jamais de parler*. ❤️",
+            "Ton super-pouvoir ? Disparaître dans un coin de la pièce dès qu'il y a plus de 3 humains.",
+
+            // Vannes sur le style Emo/Dark
+            "Si tu portes encore plus de noir, tu vas finir par absorber la lumière du soleil et provoquer une éclipse. 🌑",
+            "J'ai vérifié ton ADN : 50% Caféine, 50% Haine des gens, 100% Emo.",
+            "C'est pas une phase maman, c'est un lifestyle ! (Dit-elle avec ses tatouages incroyables).",
+            "Alerte : Une fille dark repérée sur un vélo de mamie à la salle. Crédibilité street : -1000. Mignonnerie : +10000."
+        ];
+
+        roastBtn.addEventListener('click', () => {
+            // Effet de glitch avant d'afficher
+            roastText.style.opacity = 0;
+            roastIcon.innerHTML = "⚡";
+            
+            setTimeout(() => {
+                const randomVanne = vannes[Math.floor(Math.random() * vannes.length)];
+                roastText.innerHTML = randomVanne;
+                roastText.style.opacity = 1;
+                roastIcon.innerHTML = "😈";
+                
+                // Petit tremblement de l'écran pour l'impact
+                document.body.style.transform = "translateX(5px)";
+                setTimeout(() => document.body.style.transform = "translateX(-5px)", 50);
+                setTimeout(() => document.body.style.transform = "translate(0)", 100);
+            }, 300);
+        });
+    </script>
     <!-- Gallery Section -->
     <section class="gallery-section" id="gallerySection">
         <div class="section-header">
