@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FIONA. | Dark Zone</title>
+    <title>FIONA. | The Last Chapter</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Share+Tech+Mono&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
@@ -917,21 +917,21 @@
 
         /* Smooth section transitions */
         section {
-            opacity: 0;
-            transform: translateY(30px);
+            opacity: 1;
+            transform: translateY(0);
             transition: all 0.8s ease;
         }
 
-        section.visible {
-            opacity: 1;
-            transform: translateY(0);
+        /* Animation on scroll (optional enhancement) */
+        section.animate-in {
+            animation: fadeInUp 1s ease;
         }
     </style>
 </head>
 <body>
     <!-- Loading Screen -->
     <div class="loading-screen" id="loadingScreen">
-        <div class="loading-text">INITIALIZING DARK ZONE...</div>
+        <div class="loading-text">LOADING FINAL MEMORIES...</div>
         <div class="loading-bar-container">
             <div class="loading-bar" id="loadingBar"></div>
         </div>
@@ -942,10 +942,10 @@
         <div class="particles" id="particles"></div>
         
         <div class="hero-content">
-            <div class="level-badge">⚔️ LEVEL 99 EMO</div>
-            
+            <div class="level-badge">💔 GAME OVER</div>
+
             <h1 class="main-title">Fiona</h1>
-            
+
             <div class="subtitle-container">
                 <p class="subtitle">
                     <span class="typed-text" id="typedText"></span>
@@ -954,17 +954,17 @@
 
             <div class="xp-bar-container">
                 <div class="xp-label">
-                    <span>EXP</span>
-                    <span>6,969 / 10,000</span>
+                    <span>HEARTBREAK</span>
+                    <span>∞ / ∞</span>
                 </div>
                 <div class="xp-bar">
                     <div class="xp-fill"></div>
                 </div>
             </div>
-            
+
             <button class="enter-btn" id="enterBtn">
-                <span class="btn-icon">🌙</span>
-                Entrer dans la Dark Zone
+                <span class="btn-icon">🥀</span>
+                Entrer dans les souvenirs
             </button>
         </div>
 
@@ -976,21 +976,21 @@
     <!-- Quest Timeline Section -->
   <section class="quest-section" id="questSection">
         <div class="section-header">
-            <div class="section-tag">📜 QUEST LOG</div>
-            <h2 class="section-title">Notre Timeline</h2>
+            <div class="section-tag">📜 THE COMPLETE STORY</div>
+            <h2 class="section-title">Notre Histoire en Chapitres</h2>
         </div>
 
         <div class="timeline">
             <div class="quest-item" data-quest="1">
                 <div class="quest-marker completed">✓</div>
                 <div class="quest-card">
-                    <span class="quest-status">Complétée</span>
-                    <h3 class="quest-title">🔊 Le Zinc</h3>
-                    <p class="quest-location">📍 Dans la fumée & la Techno</p>
-                    <p class="quest-desc">Rencontre au bar. Entre deux kicks de basses et l'ambiance sombre, le destin a décidé de glitcher. Première connexion établie dans le chaos.</p>
+                    <span class="quest-status">Chapitre I</span>
+                    <h3 class="quest-title">🔊 Le Zinc - La Rencontre</h3>
+                    <p class="quest-location">📍 Le commencement</p>
+                    <p class="quest-desc">C'était là que tout a commencé. Dans la fumée et les basses de la techno. On s'est échangé nos instas pour un projet de tattoo. Juste un projet artistique. Rien de plus. Du moins, c'est ce qu'on pensait.</p>
                     <div class="quest-reward">
-                        <span>🏆</span>
-                        <span>Loot : Une crush débloquée</span>
+                        <span>💫</span>
+                        <span>Une connexion inattendue</span>
                     </div>
                 </div>
             </div>
@@ -998,27 +998,111 @@
             <div class="quest-item" data-quest="2">
                 <div class="quest-marker completed">✓</div>
                 <div class="quest-card">
-                    <span class="quest-status">Complétée</span>
-                    <h3 class="quest-title">🚴‍♀️ New Atlantide</h3>
-                    <p class="quest-location">📍 Zone Cardio (aka L'Enfer)</p>
-                    <p class="quest-desc">Je me retourne et je vois quoi ? La meuf dark emo sur... son vélo de mamie en train de pédaler chill. 😂 Le hasard fait trop bien les choses (ou alors il me stalke).</p>
+                    <span class="quest-status">Chapitre II</span>
+                    <h3 class="quest-title">🚴‍♀️ New Atlantide - Le Hasard</h3>
+                    <p class="quest-location">📍 La salle de sport</p>
+                    <p class="quest-desc">Par hasard, on s'est croisés à la salle. Elle sur son vélo de mamie, moi en plein training. Le destin qui nous ramène l'un vers l'autre. Parfois le hasard fait vraiment bien les choses.</p>
                     <div class="quest-reward">
-                        <span>🏆</span>
-                        <span>XP : +500 Complicité Immédiate</span>
+                        <span>💜</span>
+                        <span>La complicité s'installe</span>
                     </div>
                 </div>
             </div>
 
             <div class="quest-item" data-quest="3">
-                <div class="quest-marker completed">▶</div>
+                <div class="quest-marker completed">✓</div>
                 <div class="quest-card">
-                    <span class="quest-status active">En cours</span>
-                    <h3 class="quest-title">💀 La Symbiose</h3>
-                    <p class="quest-location">📍 QG Secret</p>
-                    <p class="quest-desc">Statut actuel : Inséparables. On critique les tattoos moches des autres, on partage des memes douteux, et on prend notre temps (même si on s'envoie 400 messages par jour).</p>
+                    <span class="quest-status">Chapitre III</span>
+                    <h3 class="quest-title">🌟 Nous Deux</h3>
+                    <p class="quest-location">📍 Le début de nous</p>
+                    <p class="quest-desc">On a décidé de se mettre ensemble. Ma goth girl. Mommy. Mon gros batard. Les messages à 3h du matin. Son tee-shirt "Eat Your Protein" avec les refs SNK pour Noël. Son flood de memes H24. Les illuminations Ghibli qu'on devait voir ensemble. Ses dessins incroyables. Sa folie adorable. Cette connexion qu'on ne pouvait pas ignorer.</p>
                     <div class="quest-reward">
-                        <span>⏳</span>
-                        <span>Objectif : Conquérir le monde (plus tard)</span>
+                        <span>✨</span>
+                        <span>Les jours heureux</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quest-item" data-quest="4">
+                <div class="quest-marker completed">⚠</div>
+                <div class="quest-card">
+                    <span class="quest-status">Chapitre IV</span>
+                    <h3 class="quest-title">⚡ La Première Fissure</h3>
+                    <p class="quest-location">📍 Noémie</p>
+                    <p class="quest-desc">Ma meilleure amie était amoureuse de moi. Je venais de la friendzone. Je voulais du temps pour lui annoncer en douceur. J'ai demandé à Fiona d'attendre. Elle a annoncé la relation de son côté. La première vraie embrouille. J'ai voulu prendre mes distances.</p>
+                    <div class="quest-reward">
+                        <span>💢</span>
+                        <span>La confiance ébranlée</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quest-item" data-quest="5">
+                <div class="quest-marker completed">⚠</div>
+                <div class="quest-card">
+                    <span class="quest-status">Chapitre V</span>
+                    <h3 class="quest-title">🩹 Le Trauma</h3>
+                    <p class="quest-location">📍 Le tournant</p>
+                    <p class="quest-desc">Après cette distance, quelque chose de grave s'est produit. Fiona a fait un geste désespéré. J'ai vécu ça comme un trauma profond. Je n'ai pas su me relever de ça. Le poids de cette responsabilité, cette peur, cette douleur.</p>
+                    <div class="quest-reward">
+                        <span>🖤</span>
+                        <span>Blessures invisibles</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quest-item" data-quest="6">
+                <div class="quest-marker completed">⚖</div>
+                <div class="quest-card">
+                    <span class="quest-status">Chapitre VI</span>
+                    <h3 class="quest-title">🔗 La Connexion Inchangée</h3>
+                    <p class="quest-location">📍 Le retour</p>
+                    <p class="quest-desc">On s'est revus. Et malgré tout, notre connexion était toujours là. Intacte. Puissante. Comme si rien ne s'était passé. Mais quelque chose en moi avait changé. Son instabilité me faisait peur. J'avais peur pour elle, peur pour nous.</p>
+                    <div class="quest-reward">
+                        <span>⚔️</span>
+                        <span>L'amour face aux démons</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quest-item" data-quest="7">
+                <div class="quest-marker completed">✗</div>
+                <div class="quest-card">
+                    <span class="quest-status">Chapitre VII</span>
+                    <h3 class="quest-title">🎆 Le 31 Décembre</h3>
+                    <p class="quest-location">📍 La rupture</p>
+                    <p class="quest-desc">Son instabilité a eu raison de moi. Je n'étais plus assez fort. J'ai rompu le 31. Dernier jour de l'année, dernier jour de nous. Je ne savais plus comment l'aider sans me perdre moi-même.</p>
+                    <div class="quest-reward">
+                        <span>💔</span>
+                        <span>Fin de partie</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quest-item" data-quest="8">
+                <div class="quest-marker completed">?</div>
+                <div class="quest-card">
+                    <span class="quest-status">Chapitre VIII</span>
+                    <h3 class="quest-title">🍻 Le Hyde - L'Illusion</h3>
+                    <p class="quest-location">📍 Une soirée normale</p>
+                    <p class="quest-desc">On s'est revus au Hyde. Tout s'était bien passé. On parlait, on riait comme avant. Peut-être que l'amitié était possible. Peut-être qu'on pouvait rester dans la vie de l'autre, différemment.</p>
+                    <div class="quest-reward">
+                        <span>🕊️</span>
+                        <span>Un espoir fragile</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quest-item" data-quest="9">
+                <div class="quest-marker completed">💀</div>
+                <div class="quest-card">
+                    <span class="quest-status">Chapitre Final</span>
+                    <h3 class="quest-title">🥀 Le Zinc - La Fin Définitive</h3>
+                    <p class="quest-location">📍 Là où tout a commencé, là où tout s'achève</p>
+                    <p class="quest-desc">Fiona m'invite au Zinc. Retour aux sources. Mais elle était trop bourrée. Elle a embrassé des inconnus devant moi. Là, dans ce bar où on s'était rencontrés, j'ai vu la fin réelle. Pas celle du 31. La vraie fin. Celle qui fait vraiment mal. L'histoire se termine là où elle a commencé, dans la fumée du Zinc, mais cette fois dans la douleur pure.</p>
+                    <div class="quest-reward">
+                        <span>⚰️</span>
+                        <span>The End</span>
                     </div>
                 </div>
             </div>
@@ -1028,8 +1112,8 @@
     <!-- Stats Section -->
     <section class="stats-section" id="statsSection">
         <div class="section-header">
-            <div class="section-tag">📊 CHARACTER STATS</div>
-            <h2 class="section-title">Fiche Personnage</h2>
+            <div class="section-tag">📊 CHARACTER PROFILE</div>
+            <h2 class="section-title">Qui était Fiona</h2>
         </div>
 
         <div class="stats-grid">
@@ -1062,18 +1146,18 @@
                     <div class="stat-bar">
                         <div class="stat-fill potential"></div>
                     </div>
-                    <div class="stat-value">∞ OVERLOAD</div>
+                    <div class="stat-value">INFINI</div>
                 </div>
             </div>
 
             <div class="stat-card">
-                <div class="stat-icon">💜</div>
+                <div class="stat-icon">🤪</div>
                 <div class="stat-info">
-                    <div class="stat-name">Charisme Mystérieux</div>
+                    <div class="stat-name">Folie Adorable</div>
                     <div class="stat-bar">
                         <div class="stat-fill charisma"></div>
                     </div>
-                    <div class="stat-value">88/100</div>
+                    <div class="stat-value">Tarée mais unique</div>
                 </div>
             </div>
         </div>
@@ -1082,185 +1166,199 @@
     <!-- Confidence Boost Section -->
     <section class="boost-section" id="boostSection">
         <div class="section-header">
-            <div class="section-tag">💡 TRUTH BOMB</div>
-            <h2 class="section-title">Real Talk</h2>
+            <div class="section-tag">🕊️ TRUTH</div>
+            <h2 class="section-title">Ce qui reste</h2>
         </div>
 
         <div class="boost-card">
-            <div class="boost-icon">🔮</div>
-            <h3 class="boost-title">Le Plot Twist</h3>
+            <div class="boost-icon">💭</div>
+            <h3 class="boost-title">La Vérité Partagée</h3>
             <p class="boost-text">
-                Fiona pense qu'elle n'est pas prête.<br><br>
-                <strong>La réalité :</strong> ses dessins mettent tout le monde d'accord. Le talent est là. La vision est là. Le style est là.<br><br>
-                Il manque juste qu'elle s'en rende compte.
+                Notre histoire s'est terminée au Zinc, là où nos regards s'étaient croisés pour la première fois. Boucle fermée. Retour au point de départ.<br><br>
+                <strong>La vérité :</strong> On s'est tous les deux brisés. Toi avec ton instabilité, moi avec mon incapacité à gérer. Aucun gagnant. Que deux perdants qui s'aimaient mais ne pouvaient pas se sauver mutuellement.<br><br>
+                J'ai essayé. Tu as essayé. Parfois l'amour ne suffit pas quand les démons sont trop présents. Et ça, c'est la pire des leçons.
             </p>
-            <div class="achievement-popup">
-                <span>🏅</span>
-                <span>Achievement Unlocked: Future Queen du Tattoo</span>
+            <div class="achievement-popup" style="background: rgba(155, 77, 202, 0.1); border-color: rgba(155, 77, 202, 0.3); color: var(--accent-pink);">
+                <span>💔</span>
+                <span>Status: Heartbreak Level MAX</span>
             </div>
         </div>
     </section>
-<!-- 
-===========================================
-SECTION VANNES AMÉLIORÉE
-===========================================
-Remplace l'ancienne section "roastSection" et son script par ce code.
-Les vannes sont maintenant :
-- Plus méchantes/piquantes
-- Mieux catégorisées
-- Sans répétition grâce au shuffle
-- Avec un compteur de trauma
-===========================================
--->
 
-<section class="boost-section" id="roastSection" style="margin-top: 50px;">
+    <!-- What You Taught Me Section -->
+    <section class="boost-section" id="lessonsSection" style="margin-top: 50px;">
+        <div class="section-header">
+            <div class="section-tag">📖 LESSONS</div>
+            <h2 class="section-title">Ce Que Tu M'as Appris</h2>
+        </div>
+
+        <div class="boost-card">
+            <div class="boost-icon">🎓</div>
+            <h3 class="boost-title">Les Traces Positives</h3>
+            <p class="boost-text" style="text-align: left; line-height: 1.8;">
+                Malgré la fin, tu m'as laissé des choses précieuses. Des leçons que je garderai toute ma vie.<br><br>
+
+                <strong>Tu m'as appris à cuisiner.</strong> Ces moments en cuisine, à préparer des plats ensemble. Une compétence simple mais précieuse que tu m'as transmise.<br><br>
+
+                <strong>Tu m'as montré ma capacité à aimer.</strong> Avant toi, je ne savais pas que je pouvais ressentir ça. Cette intensité, cette profondeur. Tu m'as prouvé que j'en étais capable.<br><br>
+
+                <strong>Tu m'as fait manger moins de viande.</strong> Ton régime vege et sans gluten m'a poussé à changer mes habitudes. À être plus conscient de ce que je consomme.<br><br>
+
+                <strong>Tu m'as appris le piano.</strong> Ces notes, ces mélodies. Un nouvel univers que tu m'as ouvert avec patience.<br><br>
+
+                <strong>Tu m'as appris à accepter la différence.</strong> On était si différents, toi et moi. Mais c'était justement ça qui rendait tout spécial. Tu m'as montré qu'on peut aimer quelqu'un qui ne nous ressemble pas.<br><br>
+
+                <strong>Tu m'as laissé des souvenirs inoubliables.</strong> Chaque moment, chaque rire, chaque instant. Même dans la douleur, je ne regrette rien.<br><br>
+
+                Mais surtout, tu m'as appris la leçon la plus dure : <strong>prendre soin de soi d'abord.</strong> Qu'on ne peut pas sauver quelqu'un en se perdant soi-même. Que l'amour, aussi fort soit-il, a besoin de deux personnes entières.<br><br>
+
+                Ce n'était pas ton attitude, pas tes mots, mais ta façon d'être. Ton authenticité. Ta folie. Ta passion. Tout ça m'a changé, pour toujours.
+            </p>
+            <div class="achievement-popup" style="background: rgba(155, 77, 202, 0.1); border-color: rgba(155, 77, 202, 0.3); color: var(--accent-pink); margin-top: 20px;">
+                <span>✨</span>
+                <span>Ces leçons restent, même quand tu es partie</span>
+            </div>
+        </div>
+    </section>
+
+<section class="boost-section" id="memoriesSection" style="margin-top: 50px;">
     <div class="section-header">
-        <div class="section-tag">💀 DANGER ZONE</div>
-        <h2 class="section-title">La Boîte à Trauma</h2>
+        <div class="section-tag">💫 MEMORIES</div>
+        <h2 class="section-title">Les Fragments</h2>
     </div>
 
     <div class="boost-card" style="border-color: var(--accent-pink);">
-        <div class="boost-icon" id="roastIcon">🎰</div>
-        <h3 class="boost-title">Vérités non-sollicitées</h3>
-        
-        <p class="boost-text" id="roastText" style="min-height: 100px; display: flex; align-items: center; justify-content: center; text-align: center;">
-            Tu cliques, tu assumes. Pas de remboursement émotionnel prévu.
+        <div class="boost-icon" id="memoryIcon">🎭</div>
+        <h3 class="boost-title">Mémoire Aléatoire</h3>
+
+        <p class="boost-text" id="memoryText" style="min-height: 100px; display: flex; align-items: center; justify-content: center; text-align: center;">
+            Clique pour revivre un instant perdu dans le temps.
         </p>
-        
-        <div id="roastCounter" style="font-size: 0.7rem; color: var(--text-muted); margin-top: 15px; opacity: 0;">
-            Vannes encaissées : <span id="counter">0</span> 💔
+
+        <div id="memoryCounter" style="font-size: 0.7rem; color: var(--text-muted); margin-top: 15px; opacity: 0;">
+            Souvenirs revisités : <span id="counter">0</span> 💔
         </div>
-        
-        <button class="enter-btn" id="roastBtn" style="margin-top: 20px; font-size: 0.8rem; padding: 12px 25px; background: transparent; border: 1px solid var(--accent-pink); width: 100%;">
-            🎲 Tente ta chance (ou pas)
+
+        <button class="enter-btn" id="memoryBtn" style="margin-top: 20px; font-size: 0.8rem; padding: 12px 25px; background: transparent; border: 1px solid var(--accent-pink); width: 100%;">
+            🎲 Un souvenir au hasard
         </button>
     </div>
 </section>
 
 <script>
-const roastBtn = document.getElementById('roastBtn');
-const roastText = document.getElementById('roastText');
-const roastIcon = document.getElementById('roastIcon');
-const roastCounter = document.getElementById('roastCounter');
+const memoryBtn = document.getElementById('memoryBtn');
+const memoryText = document.getElementById('memoryText');
+const memoryIcon = document.getElementById('memoryIcon');
+const memoryCounter = document.getElementById('memoryCounter');
 const counter = document.getElementById('counter');
 let clickCount = 0;
 
-const vannes = [
-    // === LE MALAISE À 66KG (L'OR ABSOLU) ===
-    "66kg au tirage et t'as vu le paradis. Jésus t'a refusée à l'entrée, il a dit 'remonte, t'as pas fini ton set'. 💀",
-    
-    "T'es la seule gothique qui a failli mourir... à cause d'une poulie. Même la mort a eu la flemme de te prendre. 🏋️‍♀️⚰️",
-    
-    
-    "Ton corps a littéralement fait ctrl+alt+suppr à 66 kilos. Blue screen of death version salle de sport.",
-    
-    "66kg et ton âme a quitté le chat. Ta gothic energy a ses limites apparemment. 🖤💨",
+const memories = [
 
-    // === VEGAN + SANS GLUTEN (DOUBLE COMBO) ===
-    "Vege ET sans gluten ? Tu manges quoi concrètement ? De l'air ? Des pensées positives ? De la tristesse ? 🥗🚫",
-    
-    "T'es vege, sans gluten, et gothique. T'as choisi la difficulté maximale dans les paramètres de vie. 🎮",
-    
-    "Restaurant avec toi : 'Bonjour, vous avez de l'eau ? Sans gluten ? Et l'eau elle a souffert ou pas ?'",
-    
-    
-    "Ton corps rejette le gluten ET la viande. T'es sûre que t'es pas juste allergique au bonheur ? 🤔",
+    "Ces messages à 3h du matin où on refaisait le monde. Chaque notification faisait battre mon cœur un peu plus vite.",
 
-    
-    "C'est pas un régime alimentaire que t'as, c'est une liste de choses que t'as le droit de regarder sans toucher.",
+    "New Atlantide. Ton vélo de mamie. Mon rire quand je t'ai vue. Ce moment ridicule et parfait.",
 
-    // === SOULÈVE PAS LOURD (sauf en fente bulgare) ===
-    "Forte en fente bulgare mais c'est tout. T'es comme un Pokémon avec une seule attaque. 🎴",
-    
-    
-    "Tu soulèves pas lourd mais tu soulèves des questions existentielles. C'est déjà ça. 🤷‍♀️",
-    
-    "Tes haltères ont jamais vu un chiffre à deux caractères et c'est ok. Les roses c'est joli. 🌸",
-    
-    
-    "T'es forte en fente bulgare parce que c'est le seul exo où tu peux souffrir de façon esthétique. Très gothique.",
+    "Le tee-shirt 'Eat Your Protein' avec les refs SNK que tu m'as offert pour Noël. Le cadeau parfait de ma goth girl.",
 
-    // === DIFFÉRENCE D'ÂGE (elle 25, moi 23) ===
+    "Les illuminations Ghibli qu'on avait prévu de voir ensemble. Cette anticipation joyeuse de moments à venir.",
 
-    
-    "T'as 2 ans de plus que moi. Techniquement tu pourrais être ma babysitter. Appelle-moi 'petit'. 👶",
-    
-    "J'ai 23 ans, toi 25. Quand j'avais 10 ans, t'en avais 12. Tu jouais déjà à la grande. Rien a changé. 😏",
-    
-    "C'est mignon de sortir avec quelqu'un de plus jeune. Tu te sens comment, cougar ? 🐆",
+    "'Ma goth girl', 'Mommy', 'Gros batard'... Nos surnoms ridicules qui me faisaient sourire à chaque fois.",
 
-    // === LE STYLE GOTHIQUE ===
-    "T'es gothique mais tu fais des malaises à 66kg. Marilyn Manson est déçu. 🎸",
+    "Ton flood de memes. Cette usine à memes qui tournait H24. Tu savais toujours comment me faire rire.",
 
-    
-    "Gothique à la salle de sport c'est un oxymore. L'effort physique c'est trop mainstream pour vous non ? 🏋️‍♀️🖤",
-    
-    "Tu ressembles à quelqu'un qui pourrait invoquer un démon mais qui peut pas ouvrir un bocal de cornichons.",
+    "Ta folie. T'étais tarée, complètement tarée. Et j'aimais ça, à petite dose. Cette énergie chaotique qui te rendait unique.",
 
-    // === COMBO FATAL ===
-   
-    
-    "T'es littéralement un boss de fin de niveau pour n'importe quel restaurateur et coach sportif.",
-    
-    "Si ta vie était un jeu, le tuto dirait : 'Attention, difficulté EXTRÊME sélectionnée. Bonne chance.' ⚠️",
-    
-    "66kg t'a mise KO mais tu fais des fentes bulgares comme une queen. Ton corps est aussi cohérent que ton régime. 🤡",
-    
-    "Gothique qui mange que des légumes et qui s'évanouit à la salle. Ton énergie dark vient d'où exactement ? Du tofu ? 🖤🥦"
+    "Nos critiques impitoyables des tattoos ratés qu'on croisait. Complices dans le jugement, unis dans le style.",
+
+    "Les silences confortables. Ces moments où on n'avait pas besoin de parler pour se comprendre.",
+
+    "Tes dessins qui me laissaient sans voix. Ce talent immense que tu ne voyais pas mais qui crevait les yeux.",
+
+    "Les plans d'avenir qu'on faisait. Naïfs, optimistes, sincères. On y croyait vraiment.",
+
+    "Ta dark emo energy qui m'attirait comme un aimant. Cette aura mystérieuse impossible à ignorer.",
+
+    "Nos playlists partagées. Chaque chanson était un message codé entre nous deux.",
+
+    "Les rires partagés. Ces moments de pure joie où tout semblait léger, facile, évident.",
+
+    "Absolument tout. On aimait absolument tout faire ensemble, du plus petit au plus grand moment.",
+
+    "Nos délires à 2h du matin. Cette complicité unique qui nous unissait.",
+
+    "La première fois où nos mains se sont touchées. Cette électricité qui a tout changé.",
+
+    "Tes yeux. Ce regard qui disait plus que mille mots. Je m'y perdais à chaque fois.",
+
+    "Tes projets de tattoos. Chaque nouveau dessin que tu me montrais avec cette lueur dans les yeux.",
+
+    "Quand tu me parlais de tes rêves, de tes ambitions. Ta passion pour l'art qui débordait.",
+
+    "Notre connexion instantanée. Dès le début, on savait que c'était spécial.",
+
+    "Ton style unique. Personne ne ressemblait à Fiona. Tu étais toi, authentique, sans filtre.",
+
+    "Les moments où tu étais concentrée sur tes dessins. Te regarder créer était fascinant.",
+
+    "Nos conversations profondes. On pouvait parler de tout, de la vie, de nos peurs, de nos espoirs.",
+
+    "Ta façon de voir le monde. Différente, sombre parfois, mais toujours intéressante.",
+
+    "Chaque moment passé ensemble. Même les plus simples devenaient spéciaux avec toi."
 ];
 
-let shuffledVannes = [...vannes].sort(() => Math.random() - 0.5);
-let vanneIndex = 0;
+let shuffledMemories = [...memories].sort(() => Math.random() - 0.5);
+let memoryIndex = 0;
 
-roastBtn.addEventListener('click', () => {
-    if (vanneIndex >= shuffledVannes.length) {
-        shuffledVannes = [...vannes].sort(() => Math.random() - 0.5);
-        vanneIndex = 0;
+memoryBtn.addEventListener('click', () => {
+    if (memoryIndex >= shuffledMemories.length) {
+        shuffledMemories = [...memories].sort(() => Math.random() - 0.5);
+        memoryIndex = 0;
     }
-    
-    roastText.style.opacity = 0;
-    roastText.style.transform = 'scale(0.9)';
-    roastIcon.innerHTML = "💀";
-    roastBtn.disabled = true;
-    roastBtn.innerHTML = "⏳ Calcul du trauma...";
-    
+
+    memoryText.style.opacity = 0;
+    memoryText.style.transform = 'scale(0.9)';
+    memoryIcon.innerHTML = "⏳";
+    memoryBtn.disabled = true;
+    memoryBtn.innerHTML = "⏳ Chargement du souvenir...";
+
     setTimeout(() => {
-        roastText.innerHTML = shuffledVannes[vanneIndex];
-        roastText.style.opacity = 1;
-        roastText.style.transform = 'scale(1)';
-        roastIcon.innerHTML = "😈";
-        roastBtn.disabled = false;
-        roastBtn.innerHTML = "🎲 Encore un trauma";
-        
+        memoryText.innerHTML = shuffledMemories[memoryIndex];
+        memoryText.style.opacity = 1;
+        memoryText.style.transform = 'scale(1)';
+        memoryIcon.innerHTML = "💭";
+        memoryBtn.disabled = false;
+        memoryBtn.innerHTML = "🎲 Un autre souvenir";
+
         clickCount++;
-        vanneIndex++;
+        memoryIndex++;
         counter.textContent = clickCount;
-        roastCounter.style.opacity = 1;
-        
-        const card = document.querySelector('#roastSection .boost-card');
-        card.style.animation = 'shake 0.5s ease';
-        setTimeout(() => card.style.animation = '', 500);
-        
+        memoryCounter.style.opacity = 1;
+
+        const card = document.querySelector('#memoriesSection .boost-card');
+        card.style.animation = 'fadeGlow 1s ease';
+        setTimeout(() => card.style.animation = '', 1000);
+
     }, 800);
 });
 
 const style = document.createElement('style');
 style.textContent = `
-    @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-        20%, 40%, 60%, 80% { transform: translateX(5px); }
+    @keyframes fadeGlow {
+        0%, 100% { box-shadow: 0 0 0 rgba(155, 77, 202, 0); }
+        50% { box-shadow: 0 0 30px rgba(155, 77, 202, 0.5); }
     }
-    #roastText { transition: all 0.3s ease; }
-    #roastBtn:disabled { opacity: 0.7; cursor: not-allowed; }
+    #memoryText { transition: all 0.3s ease; }
+    #memoryBtn:disabled { opacity: 0.7; cursor: not-allowed; }
 `;
 document.head.appendChild(style);
 </script>
     <!-- Gallery Section -->
     <section class="gallery-section" id="gallerySection">
         <div class="section-header">
-            <div class="section-tag">🖼️ PORTFOLIO PREVIEW</div>
-            <h2 class="section-title">Galerie</h2>
+            <div class="section-tag">🖼️ GALLERY</div>
+            <h2 class="section-title">Les Étapes</h2>
         </div>
 
         <div class="gallery-container">
@@ -1270,42 +1368,42 @@ document.head.appendChild(style);
                         <span class="gallery-icon">🌙</span>
                     </div>
                     <div class="gallery-info">
-                        <span class="gallery-badge">Coming Soon</span>
-                        <h3 class="gallery-title">Futur Best-Seller</h3>
-                        <p class="gallery-desc">Le premier design qui va faire le buzz</p>
+                        <span class="gallery-badge">Le Début</span>
+                        <h3 class="gallery-title">Le Zinc</h3>
+                        <p class="gallery-desc">Dans la fumée et la techno, tout commence</p>
                     </div>
                 </div>
 
                 <div class="gallery-item">
                     <div class="gallery-preview">
-                        <span class="gallery-icon">🦋</span>
+                        <span class="gallery-icon">💜</span>
                     </div>
                     <div class="gallery-info">
-                        <span class="gallery-badge">Reserved</span>
-                        <h3 class="gallery-title">Réservé pour Yamy</h3>
-                        <p class="gallery-desc">...peut-être. On prend le temps 😏</p>
+                        <span class="gallery-badge">La Connexion</span>
+                        <h3 class="gallery-title">Nous Deux</h3>
+                        <p class="gallery-desc">Les jours heureux, la complicité, l'amour</p>
                     </div>
                 </div>
 
                 <div class="gallery-item">
                     <div class="gallery-preview">
-                        <span class="gallery-icon">🔥</span>
+                        <span class="gallery-icon">⚠️</span>
                     </div>
                     <div class="gallery-info">
-                        <span class="gallery-badge">Legendary</span>
-                        <h3 class="gallery-title">Chef d'œuvre #3</h3>
-                        <p class="gallery-desc">L'art qui laisse des traces (sur la peau)</p>
+                        <span class="gallery-badge">La Chute</span>
+                        <h3 class="gallery-title">Les Démons</h3>
+                        <p class="gallery-desc">Embrouilles, trauma, instabilité, rupture</p>
                     </div>
                 </div>
 
                 <div class="gallery-item">
                     <div class="gallery-preview">
-                        <span class="gallery-icon">⚔️</span>
+                        <span class="gallery-icon">💔</span>
                     </div>
                     <div class="gallery-info">
-                        <span class="gallery-badge">Dark Collection</span>
-                        <h3 class="gallery-title">Emo Vibes Only</h3>
-                        <p class="gallery-desc">100% authentique, 0% mainstream</p>
+                        <span class="gallery-badge">La Fin</span>
+                        <h3 class="gallery-title">Retour au Zinc</h3>
+                        <p class="gallery-desc">L'histoire se termine là où elle a commencé</p>
                     </div>
                 </div>
             </div>
@@ -1319,15 +1417,49 @@ document.head.appendChild(style);
     </section>
 
 
+    <!-- Final Memory Section -->
+    <section class="boost-section" id="finalMemorySection" style="margin-top: 50px; padding-bottom: 80px;">
+        <div class="section-header">
+            <div class="section-tag">📸 THE LAST MEMORY</div>
+            <h2 class="section-title">Nous</h2>
+        </div>
+
+        <div class="boost-card" style="max-width: 500px; margin: 0 auto; padding: 40px 30px;">
+            <div style="position: relative; margin-bottom: 25px;">
+                <div style="position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px; border: 2px solid var(--accent-purple); border-radius: 12px; opacity: 0.3;"></div>
+                <div style="position: relative; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 40px rgba(155, 77, 202, 0.4);">
+                    <img src="couple.jpeg" alt="Nous deux" style="width: 100%; height: auto; display: block; border-radius: 8px;">
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <p style="font-family: 'Cinzel', serif; font-size: 1.1rem; color: var(--text-light); margin-bottom: 15px; font-style: italic;">
+                    "Avant que tout ne change"
+                </p>
+                <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.7;">
+                    Cette photo reste. Un instant figé dans le temps. Quand tout était simple, quand tout était possible. Avant les tempêtes, avant la fin. Juste nous deux.
+                </p>
+            </div>
+
+            <div style="margin-top: 30px; padding-top: 25px; border-top: 1px solid rgba(155, 77, 202, 0.2); text-align: center;">
+                <p style="font-size: 0.85rem; color: var(--accent-pink); font-family: 'Cinzel', serif;">
+                    On s'est aimés. On s'est brisés.<br>
+                    Mais on a existé. Ensemble.
+                </p>
+            </div>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer>
         <div class="footer-content">
             <div class="footer-logo">F.</div>
-            <p class="footer-quote">"Le hasard fait trop bien les choses."</p>
+            <p class="footer-quote">"Même les plus belles histoires se terminent parfois."</p>
             <p class="footer-text">
-                Site codé avec <span class="heart">♥</span> parce que certaines rencontres méritent plus qu'un simple "hey".
+                Site codé avec <span class="heart">💔</span> en mémoire d'une histoire qui méritait mieux qu'une fin.<br>
+                On s'est aimés. On s'est brisés. On ne s'oubliera jamais.
             </p>
-            <p class="footer-credit">Yamy © 2024 | Dark Zone v1.0</p>
+            <p class="footer-credit">Yamy © 2026 | The Last Chapter v1.1</p>
         </div>
     </footer>
 
@@ -1370,10 +1502,10 @@ document.head.appendChild(style);
         // Typing effect
         function typeWriter() {
             const texts = [
-                'Future Queen du Tattoo',
-                'Emo en Chef',
-                'Artist Level 99',
-                'Dark Side Only'
+                'Une histoire gravée dans le temps',
+                'Des souvenirs qui restent',
+                'Le dernier chapitre de nous',
+                'Ce que nous avons été'
             ];
             let textIndex = 0;
             let charIndex = 0;
