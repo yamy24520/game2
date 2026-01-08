@@ -2155,12 +2155,9 @@ document.head.appendChild(style);
 
         // ===== AI CHATBOT SYSTEM =====
 
-        // Configuration API - Appel direct avec proxy CORS
+        // Configuration API - Vercel Edge Function (pas de CORS!)
         const CHATBOT_CONFIG = {
-            apiKey: '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',
-            // Utilise un proxy CORS gratuit pour contourner les restrictions
-            proxyUrl: 'https://api.allorigins.win/raw?url=',
-            apiUrl: 'https://api.anthropic.com/v1/messages',
+            apiUrl: '/api/chat',  // Appelle la Edge Function Vercel
             model: 'claude-sonnet-4-5'
         };
 
@@ -2329,23 +2326,18 @@ Ta mission est d'aider à revivre, comprendre et donner du sens à cette histoir
             });
 
             try {
-                // Call Claude API directement avec proxy CORS
-                const requestBody = JSON.stringify({
-                    model: CHATBOT_CONFIG.model,
-                    max_tokens: 1024,
-                    system: SYSTEM_CONTEXT,
-                    messages: chatbotHistory
-                });
-
+                // Call Vercel Edge Function (pas de CORS!)
                 const response = await fetch(CHATBOT_CONFIG.apiUrl, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'x-api-key': CHATBOT_CONFIG.apiKey,
-                        'anthropic-version': '2023-06-01'
+                        'Content-Type': 'application/json'
                     },
-                    body: requestBody,
-                    mode: 'cors'
+                    body: JSON.stringify({
+                        model: CHATBOT_CONFIG.model,
+                        max_tokens: 1024,
+                        system: SYSTEM_CONTEXT,
+                        messages: chatbotHistory
+                    })
                 });
 
                 if (!response.ok) {
