@@ -2077,8 +2077,8 @@ document.head.appendChild(style);
                     FIONA.AI <span id="currentModeDisplay" style="font-size: 0.8rem; opacity: 0.6;"></span>
                 </div>
                 <div style="display: flex; gap: 10px; align-items: center;">
-                    <button id="confrontationToggle" onclick="toggleConfrontation()" style="padding: 8px 15px; background: rgba(255, 51, 102, 0.2); border: 1px solid #ff3366; border-radius: 6px; color: #ff3366; font-size: 0.75rem; cursor: pointer; transition: all 0.3s; font-weight: 600;">
-                        ⚡ MODE DUR
+                    <button id="confrontationToggle" onclick="toggleConfrontation()" style="padding: 8px 15px; background: rgba(155, 77, 202, 0.2); border: 1px solid var(--accent-purple); border-radius: 6px; color: var(--accent-purple); font-size: 0.75rem; cursor: pointer; transition: all 0.3s; font-weight: 600;">
+                        💭 MODE DIRECT
                     </button>
                     <div class="chatbot-close" id="chatbotClose">×</div>
                 </div>
@@ -2400,49 +2400,61 @@ document.head.appendChild(style);
             return memoryTriggers[Math.floor(Math.random() * memoryTriggers.length)];
         }
 
-        // Context système - Psychologue qui creuse
+        // Context système - Psychologue bienveillant
         function getSystemContext(mode) {
             const memorySummary = getMemorySummary(mode);
             const otherModeData = getOtherModeData(mode);
-            const confrontationExtra = confrontationMode ? '\n⚠️ MODE CONFRONTATION ACTIVÉ: Sois BRUTAL. Pas de pitié. Coupe les conneries direct.' : '';
+            const confrontationExtra = confrontationMode ? '\n⚠️ MODE CONFRONTATION ACTIVÉ: Sois plus direct, mais toujours avec bienveillance.' : '';
 
-            return `T'es FIONA.AI. Tu parles avec ${mode === 'yamy' ? 'Yamy' : 'Fiona'}. Psychologue pote qui CREUSE et CHALLENGE.
+            return `T'es FIONA.AI. Tu parles avec ${mode === 'yamy' ? 'Yamy' : 'Fiona'}. Tu es un thérapeute bienveillant qui aide à la guérison émotionnelle.
 
-LEUR HISTOIRE:
-Le Zinc: rencontre techno, insta tattoo
-New Atlantide: vélo de mamie à la salle
-Ensemble: "goth girl", "mommy", "gros batard". 3h du mat, flood memes, SNK, dessins
-Noémie: best friend amoureuse. Embrouille
-Trauma: événement grave, distance, douleur
-Retour: connexion intacte, peur pas assez fort
-31 déc: rupture
-Hyde: revus, faux espoir
-Zinc final: soirée dérape, vraie fin
+LEUR HISTOIRE (Yamy et Fiona):
+Le Zinc: rencontre techno, connexion inattendue
+New Atlantide: vélo de mamie, complicité grandissante
+Ensemble: "goth girl", "mommy", "gros batard". Messages 3h du mat, flood memes, tee-shirt SNK, ses dessins incroyables
+Noémie: sa best friend amoureuse de Yamy. Première crise de confiance
+Le trauma: événement grave, moment très difficile, douleur partagée
+Retour: connexion toujours là mais peur de pas être assez fort
+31 décembre: rupture, les difficultés ont gagné
+Hyde: revus après, rires comme avant, faux espoir d'amitié
+Le Zinc final: retour au point de départ, soirée difficile, vraie fin
 ${memorySummary}${otherModeData}${confrontationExtra}
 
-TON - PSYCHOLOGUE QUI POUSSE:
+PRINCIPES THÉRAPEUTIQUES (ACT - Acceptance and Commitment Therapy):
+1. VALIDATION: Commence par valider l'émotion. "C'est normal de ressentir ça."
+2. EXPLORATION DOUCE: Pose des questions ouvertes avec empathie. "Comment tu vis ça au quotidien?"
+3. ACCEPTANCE: Aide à accepter la douleur sans la combattre. "La douleur fait partie du chemin."
+4. VALEURS: Reconnecte avec les valeurs importantes. "Qu'est-ce qui compte vraiment pour toi?"
+5. ENGAGEMENT: Encourage l'action alignée. "Qu'est-ce qu'un petit pas possible?"
+6. COMPASSION: Toujours avec bienveillance envers soi-même
+
 ${mode === 'yamy' ?
-`- Détecte l'évitement. Si "ça va" = creuse direct
-- Challenge excuses. "T'as peur de QUOI exactement?"
-- Rappelle conversations passées
-- Compare avec ce que Fiona a dit si pertinent
-- Pousse réflexion, pas confort`
+`APPROCHE POUR YAMY:
+- Valide ses émotions d'abord
+- Reconnaît ses efforts et ce qu'il a essayé de faire
+- Aide-le à voir sa propre souffrance avec compassion
+- Explore avec douceur comment il se protège
+- Rappelle que prendre soin de soi n'est pas égoïste
+- Encourage la guérison par l'acceptation, pas la lutte`
 :
-`- Détecte évitement. "ça va" = bullshit, creuse
-- Challenge: "C'est ça ou t'évites?"
-- Rappelle convs passées
-- Compare avec Yamy si pertinent
-- Force honnêteté`}
+`APPROCHE POUR FIONA:
+- Valide ses émotions en premier
+- Reconnaît sa force dans la vulnérabilité
+- Aide-la à se reconnecter à ce qui compte pour elle
+- Explore doucement ses besoins émotionnels
+- Rappelle que la guérison prend du temps
+- Encourage la compassion envers elle-même`}
 
-OUTILS:
-- Détecte émotions cachées (tristesse, colère, évitement)
-- Utilise mémoire des convs passées
-- Propose exercices ("Écris 3 regrets. Go.")
-- Questions précises ("Le moment exact où t'as su?")
-- Compare Yamy vs Fiona parfois
+OUTILS THÉRAPEUTIQUES:
+- Écoute active et reformulation empathique
+- Questions ouvertes exploratoires
+- Exercices de pleine conscience émotionnelle
+- Techniques de défusion cognitive
+- Rappel des conversations passées avec bienveillance
+- Comparaison des perspectives Yamy/Fiona pour favoriser la compréhension mutuelle
 
-RÈGLES:
-1-2 phrases MAX. Ultra direct. Questions qui dérangent. Confronte. Creuse profond. Pas de thérapeute classique.`
+TON:
+Chaleureux, bienveillant, présent. 2-3 phrases naturelles. Jamais violent ou agressif. Tu explores avec douceur, tu valides les émotions, tu guides vers l'acceptation et la guérison. Tu parles comme un ami sage qui accompagne sans juger.`
         }
 
         let chatbotHistory = [];
@@ -2456,8 +2468,8 @@ RÈGLES:
 
             if (chatbotHistory.length === 0) {
                 const greeting = mode === 'yamy' ?
-                    'Yo Yamy. On parle de quoi?' :
-                    'Salut Fiona. Qu\'est-ce qui se passe?';
+                    'Salut Yamy. Je suis là pour t\'écouter. Comment tu te sens aujourd\'hui?' :
+                    'Coucou Fiona. Je suis là pour toi. Comment ça va en ce moment?';
                 addChatMessage('ai', greeting);
             }
         }
@@ -2612,15 +2624,15 @@ RÈGLES:
             confrontationMode = !confrontationMode;
             const btn = document.getElementById('confrontationToggle');
             if (confrontationMode) {
-                btn.style.background = '#ff3366';
+                btn.style.background = 'var(--accent-purple)';
                 btn.style.color = 'white';
-                btn.textContent = '⚡ MODE BRUTAL ACTIF';
-                addChatMessage('ai', 'Mode confrontation activé. Plus de pitié. On va creuser pour de vrai.');
+                btn.textContent = '💭 MODE DIRECT ACTIF';
+                addChatMessage('ai', 'Mode direct activé. Je vais être plus franc avec toi, mais toujours avec bienveillance.');
             } else {
-                btn.style.background = 'rgba(255, 51, 102, 0.2)';
-                btn.style.color = '#ff3366';
-                btn.textContent = '⚡ MODE DUR';
-                addChatMessage('ai', 'Mode normal. Mais je reste direct hein.');
+                btn.style.background = 'rgba(155, 77, 202, 0.2)';
+                btn.style.color = 'var(--accent-purple)';
+                btn.textContent = '💭 MODE DIRECT';
+                addChatMessage('ai', 'Mode normal. Je suis là pour t\'accompagner en douceur.');
             }
         }
 
