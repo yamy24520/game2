@@ -32,9 +32,16 @@ export default async function handler(request) {
     // Récupère la clé API depuis les variables d'environnement Vercel
     const apiKey = process.env.ANTHROPIC_API_KEY;
 
+    // Debug: log si la clé existe (sans montrer la valeur)
+    console.log('API Key exists:', !!apiKey);
+    console.log('Environment vars:', Object.keys(process.env));
+
     if (!apiKey) {
       return new Response(
-        JSON.stringify({ error: 'API key not configured in Vercel environment variables' }),
+        JSON.stringify({
+          error: 'API key not configured in Vercel environment variables',
+          hint: 'Go to Vercel Dashboard > Settings > Environment Variables and add ANTHROPIC_API_KEY'
+        }),
         { status: 500, headers }
       );
     }
