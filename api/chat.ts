@@ -5,7 +5,7 @@ export const config = {
   runtime: 'edge',
 };
 
-export default async function handler(request) {
+export default async function handler(request: Request) {
   // CORS headers
   const headers = {
     'Access-Control-Allow-Origin': '*',
