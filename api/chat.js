@@ -29,11 +29,21 @@ export default async function handler(request) {
   try {
     const { model, max_tokens, system, messages } = await request.json();
 
+    // Récupère la clé API depuis les variables d'environnement Vercel
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+
+    if (!apiKey) {
+      return new Response(
+        JSON.stringify({ error: 'API key not configured in Vercel environment variables' }),
+        { status: 500, headers }
+      );
+    }
+
     const apiResponse = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': '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',
+        'x-api-key': apiKey,
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
