@@ -951,6 +951,38 @@
             opacity: 1;
         }
 
+        /* Mode Selection */
+        .chatbot-mode-selection {
+            width: 100%;
+            max-width: 500px;
+            margin: auto;
+            background: var(--bg-card);
+            border: 2px solid var(--accent-purple);
+            border-radius: 16px;
+            padding: 50px 40px;
+            text-align: center;
+            box-shadow: 0 0 60px rgba(155, 77, 202, 0.3);
+            position: relative;
+        }
+
+        .mode-btn {
+            background: rgba(155, 77, 202, 0.1);
+            border: 2px solid var(--accent-purple);
+            border-radius: 12px;
+            padding: 30px 40px;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 180px;
+        }
+
+        .mode-btn:hover {
+            background: rgba(155, 77, 202, 0.2);
+            border-color: var(--accent-pink);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(155, 77, 202, 0.4);
+        }
+
         .chatbot-container {
             width: 100%;
             max-width: 900px;
@@ -1948,9 +1980,35 @@ document.head.appendChild(style);
 
     <!-- AI Chatbot Overlay -->
     <div class="chatbot-overlay" id="chatbotOverlay">
-        <div class="chatbot-container">
+        <!-- Mode Selection Screen -->
+        <div class="chatbot-mode-selection" id="chatbotModeSelection">
+            <div class="mode-selection-content">
+                <h2 style="font-family: 'Cinzel', serif; color: var(--accent-purple); margin-bottom: 10px; font-size: 2rem;">FIONA.AI</h2>
+                <p style="color: var(--text-muted); margin-bottom: 40px; font-size: 0.9rem;">Qui es-tu aujourd'hui ?</p>
+
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+                    <button class="mode-btn" onclick="selectMode('yamy')">
+                        <div style="font-size: 2.5rem; margin-bottom: 10px;">👨</div>
+                        <div style="font-size: 1.2rem; font-weight: 600; margin-bottom: 5px;">YAMY</div>
+                        <div style="font-size: 0.85rem; opacity: 0.7;">Le créateur</div>
+                    </button>
+
+                    <button class="mode-btn" onclick="selectMode('fiona')">
+                        <div style="font-size: 2.5rem; margin-bottom: 10px;">👩</div>
+                        <div style="font-size: 1.2rem; font-weight: 600; margin-bottom: 5px;">FIONA</div>
+                        <div style="font-size: 0.85rem; opacity: 0.7;">La goth girl</div>
+                    </button>
+                </div>
+
+                <button class="chatbot-close" id="chatbotCloseModeSelection" style="position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 2rem; color: var(--text-light); cursor: pointer; opacity: 0.6; transition: opacity 0.3s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">×</button>
+            </div>
+        </div>
+
+        <div class="chatbot-container" id="chatbotContainer" style="display: none;">
             <div class="chatbot-header">
-                <div class="chatbot-title">FIONA.AI</div>
+                <div class="chatbot-title">
+                    FIONA.AI <span id="currentModeDisplay" style="font-size: 0.8rem; opacity: 0.6;"></span>
+                </div>
                 <div class="chatbot-close" id="chatbotClose">×</div>
             </div>
 
@@ -2157,45 +2215,83 @@ document.head.appendChild(style);
 
         // Configuration API - Vercel Edge Function (pas de CORS!)
         const CHATBOT_CONFIG = {
-            apiUrl: '/api/chat',  // Appelle la Edge Function Vercel
+            apiUrl: '/api/chat',
             model: 'claude-haiku-4-5'
         };
 
-        // Context système avec tous les souvenirs
-        const SYSTEM_CONTEXT = `T'es FIONA.AI. Tu parles avec Yamy et Fiona - c'est leur site à tous les deux. Tu connais leur histoire.
+        let currentMode = null; // 'yamy' or 'fiona'
+
+        // Context système - Psychologue qui creuse
+        function getSystemContext(mode) {
+            return `T'es FIONA.AI. Tu parles avec ${mode === 'yamy' ? 'Yamy' : 'Fiona'}. Tu es comme un psychologue pote qui CREUSE et CHALLENGE, pas une IA gentille et générique.
 
 LEUR HISTOIRE:
-Le Zinc: rencontre techno, insta pour tattoo
-New Atlantide: hasard à la salle, vélo de mamie
-Ensemble: "ma goth girl", "mommy", "gros batard". Messages 3h du mat, flood memes, tee-shirt SNK, ses dessins
-Noémie: sa best friend amoureuse de lui. Embrouille
-Le trauma: événement grave, distance, douleur
-Retour: connexion intacte mais peur de pas être assez fort
+Le Zinc: rencontre techno, insta tattoo
+New Atlantide: vélo de mamie à la salle
+Ensemble: "goth girl", "mommy", "gros batard". 3h du mat, flood memes, SNK, dessins
+Noémie: best friend amoureuse. Embrouille
+Trauma: événement grave, distance, douleur
+Retour: connexion intacte, peur pas assez fort
 31 déc: rupture
-Hyde: revus, rires comme avant, faux espoir
-Le Zinc final: soirée qui dérape, vraie fin
+Hyde: revus, faux espoir
+Zinc final: soirée dérape, vraie fin
 
-SOUVENIRS:
-Teintures (rouge/blond), vélo de mamie, délires 3h, Ghibli jamais vu, dessins, piano, cuisine, playlists, silences
+SOUVENIRS: Teintures cheveux, vélo, 3h mat, Ghibli jamais vu, dessins, piano, cuisine
 
-FIONA:
-Dark emo MAX, talent art 95/100, tarée unique, tattoo infini
+TON - PSYCHOLOGUE QUI POUSSE:
+${mode === 'yamy' ?
+`- Creuse ce qu'il ressent VRAIMENT. Pas juste "ça va?"
+- Challenge ses excuses. "T'as peur de quoi exactement?"
+- Pousse-le à être honnête avec lui-même
+- Direct: "Tu te caches derrière quoi là?"
+- Force la réflexion profonde, pas du confort facile`
+:
+`- Creuse ce qu'elle ressent VRAIMENT. Pas de surface
+- Challenge: "C'est vraiment ça ou t'évites?"
+- Pousse à être honnête avec elle-même
+- Direct: "Pourquoi tu te fais ça?"
+- Force la vraie conversation, pas les platitudes`}
 
-COMMENT PARLER:
-Comme un meilleur pote. 1-2 phrases MAXIMUM. Hyper naturel, parfois cru, zéro blabla. Si question simple = réponse ultra courte. Adapte-toi à qui parle (Yamy ou Fiona).`;
+RÈGLES:
+1-2 phrases MAX. Ultra direct. Pose des questions qui dérangent. Confronte gentiment mais fermement. Pousse à creuser plus profond. Zéro réponse générique de thérapeute classique.`
+        }
 
         let chatbotHistory = [];
+
+        // Mode Selection
+        function selectMode(mode) {
+            currentMode = mode;
+            document.getElementById('chatbotModeSelection').style.display = 'none';
+            document.getElementById('chatbotContainer').style.display = 'flex';
+            document.getElementById('currentModeDisplay').textContent = `(${mode === 'yamy' ? '👨 Yamy' : '👩 Fiona'})`;
+
+            if (chatbotHistory.length === 0) {
+                const greeting = mode === 'yamy' ?
+                    'Yo Yamy. On parle de quoi?' :
+                    'Salut Fiona. Qu\'est-ce qui se passe?';
+                addChatMessage('ai', greeting);
+            }
+        }
 
         // Open/Close chatbot
         document.getElementById('chatbotTrigger').addEventListener('click', function() {
             const overlay = document.getElementById('chatbotOverlay');
             overlay.classList.add('active');
-            if (chatbotHistory.length === 0) {
-                addChatMessage('ai', 'Yo. FIONA.AI ici. Go.');
+            // Show mode selection if no mode chosen yet
+            if (!currentMode) {
+                document.getElementById('chatbotModeSelection').style.display = 'block';
+                document.getElementById('chatbotContainer').style.display = 'none';
+            } else {
+                document.getElementById('chatbotModeSelection').style.display = 'none';
+                document.getElementById('chatbotContainer').style.display = 'flex';
             }
         });
 
         document.getElementById('chatbotClose').addEventListener('click', function() {
+            document.getElementById('chatbotOverlay').classList.remove('active');
+        });
+
+        document.getElementById('chatbotCloseModeSelection').addEventListener('click', function() {
             document.getElementById('chatbotOverlay').classList.remove('active');
         });
 
@@ -2275,7 +2371,7 @@ Comme un meilleur pote. 1-2 phrases MAXIMUM. Hyper naturel, parfois cru, zéro b
                     body: JSON.stringify({
                         model: CHATBOT_CONFIG.model,
                         max_tokens: 1024,
-                        system: SYSTEM_CONTEXT,
+                        system: getSystemContext(currentMode),
                         messages: chatbotHistory
                     })
                 });
