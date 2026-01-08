@@ -1978,6 +1978,73 @@ document.head.appendChild(style);
         🤖
     </div>
 
+    <!-- Admin Panel Trigger -->
+    <div style="position: fixed; bottom: 100px; right: 30px; z-index: 9998;">
+        <button id="adminTrigger" style="width: 50px; height: 50px; border-radius: 50%; background: rgba(155, 77, 202, 0.2); border: 2px solid var(--accent-purple); color: var(--accent-purple); font-size: 1.5rem; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 15px rgba(155, 77, 202, 0.3);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+            ⚙️
+        </button>
+    </div>
+
+    <!-- Admin Panel Overlay -->
+    <div class="chatbot-overlay" id="adminOverlay" style="display: none;">
+        <div class="chatbot-container" style="max-width: 1100px;">
+            <div class="chatbot-header">
+                <div class="chatbot-title">🔐 PANNEAU ADMIN - MÉMOIRE IA</div>
+                <div class="chatbot-close" id="adminClose">×</div>
+            </div>
+
+            <div style="padding: 25px; overflow-y: auto; flex: 1;">
+                <!-- Stats -->
+                <div style="display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 200px; background: rgba(155, 77, 202, 0.1); border: 1px solid var(--accent-purple); border-radius: 8px; padding: 20px; text-align: center;">
+                        <div style="font-size: 2rem; color: var(--accent-purple); margin-bottom: 10px;">👨</div>
+                        <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px;">YAMY</div>
+                        <div id="yamaConvCount" style="font-size: 1.5rem; font-weight: 600; color: var(--text-light);">0</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">conversations</div>
+                    </div>
+
+                    <div style="flex: 1; min-width: 200px; background: rgba(255, 51, 102, 0.1); border: 1px solid var(--accent-pink); border-radius: 8px; padding: 20px; text-align: center;">
+                        <div style="font-size: 2rem; color: var(--accent-pink); margin-bottom: 10px;">👩</div>
+                        <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px;">FIONA</div>
+                        <div id="fionaConvCount" style="font-size: 1.5rem; font-weight: 600; color: var(--text-light);">0</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">conversations</div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div style="display: flex; gap: 10px; margin-bottom: 30px; flex-wrap: wrap;">
+                    <button onclick="exportMemory()" style="padding: 12px 20px; background: var(--accent-purple); border: none; border-radius: 6px; color: white; cursor: pointer; font-weight: 600; transition: all 0.3s;">
+                        📥 EXPORTER JSON
+                    </button>
+                    <button onclick="clearYamyMemory()" style="padding: 12px 20px; background: rgba(155, 77, 202, 0.2); border: 1px solid var(--accent-purple); border-radius: 6px; color: var(--accent-purple); cursor: pointer; font-weight: 600; transition: all 0.3s;">
+                        🗑️ EFFACER YAMY
+                    </button>
+                    <button onclick="clearFionaMemory()" style="padding: 12px 20px; background: rgba(255, 51, 102, 0.2); border: 1px solid var(--accent-pink); border-radius: 6px; color: var(--accent-pink); cursor: pointer; font-weight: 600; transition: all 0.3s;">
+                        🗑️ EFFACER FIONA
+                    </button>
+                    <button onclick="clearAllMemory()" style="padding: 12px 20px; background: rgba(255, 51, 102, 0.3); border: 1px solid #ff3366; border-radius: 6px; color: #ff3366; cursor: pointer; font-weight: 600; transition: all 0.3s;">
+                        ⚠️ TOUT EFFACER
+                    </button>
+                </div>
+
+                <!-- Tabs -->
+                <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid rgba(155, 77, 202, 0.3); padding-bottom: 10px;">
+                    <button id="tabYamy" onclick="switchAdminTab('yamy')" style="padding: 10px 20px; background: var(--accent-purple); border: none; border-radius: 6px 6px 0 0; color: white; cursor: pointer; font-weight: 600;">
+                        👨 YAMY
+                    </button>
+                    <button id="tabFiona" onclick="switchAdminTab('fiona')" style="padding: 10px 20px; background: rgba(255, 51, 102, 0.2); border: none; border-radius: 6px 6px 0 0; color: var(--accent-pink); cursor: pointer; font-weight: 600;">
+                        👩 FIONA
+                    </button>
+                </div>
+
+                <!-- Memory Display -->
+                <div id="memoryDisplay" style="background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(155, 77, 202, 0.3); border-radius: 8px; padding: 20px; max-height: 500px; overflow-y: auto;">
+                    <!-- Conversations will be displayed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- AI Chatbot Overlay -->
     <div class="chatbot-overlay" id="chatbotOverlay">
         <!-- Mode Selection Screen -->
@@ -2579,6 +2646,142 @@ RÈGLES:
             this.style.height = 'auto';
             this.style.height = Math.min(this.scrollHeight, 120) + 'px';
         });
+
+        // === PANNEAU ADMIN ===
+        let currentAdminTab = 'yamy';
+
+        // Open/Close admin panel
+        document.getElementById('adminTrigger').addEventListener('click', function() {
+            document.getElementById('adminOverlay').classList.add('active');
+            updateAdminPanel();
+        });
+
+        document.getElementById('adminClose').addEventListener('click', function() {
+            document.getElementById('adminOverlay').classList.remove('active');
+        });
+
+        // Switch tabs
+        function switchAdminTab(mode) {
+            currentAdminTab = mode;
+
+            // Update button styles
+            if (mode === 'yamy') {
+                document.getElementById('tabYamy').style.background = 'var(--accent-purple)';
+                document.getElementById('tabYamy').style.color = 'white';
+                document.getElementById('tabFiona').style.background = 'rgba(255, 51, 102, 0.2)';
+                document.getElementById('tabFiona').style.color = 'var(--accent-pink)';
+            } else {
+                document.getElementById('tabFiona').style.background = 'var(--accent-pink)';
+                document.getElementById('tabFiona').style.color = 'white';
+                document.getElementById('tabYamy').style.background = 'rgba(155, 77, 202, 0.2)';
+                document.getElementById('tabYamy').style.color = 'var(--accent-purple)';
+            }
+
+            displayMemoryForMode(mode);
+        }
+
+        // Display memory for specific mode
+        function displayMemoryForMode(mode) {
+            const display = document.getElementById('memoryDisplay');
+            const mem = emotionalMemory[mode];
+
+            if (!mem || mem.conversations.length === 0) {
+                display.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 40px;">Aucune conversation enregistrée pour ${mode === 'yamy' ? 'Yamy' : 'Fiona'}</div>`;
+                return;
+            }
+
+            let html = '';
+            mem.conversations.reverse().forEach((conv, index) => {
+                const date = new Date(conv.date);
+                const dateStr = date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+                const emotionColor = {
+                    'évitement': '#ffa500',
+                    'tristesse': '#4169e1',
+                    'colère': '#ff4444',
+                    'peur': '#9370db',
+                    'confusion': '#808080',
+                    'culpabilité': '#8b4513',
+                    'solitude': '#483d8b',
+                    'neutre': '#888888'
+                }[conv.emotion] || '#888888';
+
+                html += `
+                    <div style="margin-bottom: 20px; border-left: 3px solid ${emotionColor}; padding-left: 15px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 4px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">${dateStr}</span>
+                            <span style="font-size: 0.75rem; padding: 4px 10px; background: ${emotionColor}; color: white; border-radius: 12px; font-weight: 600;">${conv.emotion}</span>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <div style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 5px;">👤 ${mode === 'yamy' ? 'YAMY' : 'FIONA'}:</div>
+                            <div style="color: var(--text-light); font-size: 0.9rem;">${conv.user}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 5px;">🤖 FIONA.AI:</div>
+                            <div style="color: var(--text-light); font-size: 0.9rem; opacity: 0.8;">${conv.ai}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            display.innerHTML = html;
+        }
+
+        // Update admin panel stats
+        function updateAdminPanel() {
+            const yamaCount = emotionalMemory.yamy?.conversations?.length || 0;
+            const fionaCount = emotionalMemory.fiona?.conversations?.length || 0;
+
+            document.getElementById('yamaConvCount').textContent = yamaCount;
+            document.getElementById('fionaConvCount').textContent = fionaCount;
+
+            displayMemoryForMode(currentAdminTab);
+        }
+
+        // Export memory as JSON
+        function exportMemory() {
+            const dataStr = JSON.stringify(emotionalMemory, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `fionaai_memory_${new Date().toISOString().slice(0,10)}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Clear Yamy memory
+        function clearYamyMemory() {
+            if (confirm('Effacer toutes les conversations de Yamy ?')) {
+                emotionalMemory.yamy = { conversations: [], lastSeen: null, emotionalState: [] };
+                saveMemory();
+                updateAdminPanel();
+                alert('Mémoire de Yamy effacée.');
+            }
+        }
+
+        // Clear Fiona memory
+        function clearFionaMemory() {
+            if (confirm('Effacer toutes les conversations de Fiona ?')) {
+                emotionalMemory.fiona = { conversations: [], lastSeen: null, emotionalState: [] };
+                saveMemory();
+                updateAdminPanel();
+                alert('Mémoire de Fiona effacée.');
+            }
+        }
+
+        // Clear all memory
+        function clearAllMemory() {
+            if (confirm('⚠️ ATTENTION: Effacer TOUTE la mémoire (Yamy + Fiona) ?\n\nCette action est irréversible !')) {
+                emotionalMemory = {
+                    yamy: { conversations: [], lastSeen: null, emotionalState: [] },
+                    fiona: { conversations: [], lastSeen: null, emotionalState: [] }
+                };
+                saveMemory();
+                updateAdminPanel();
+                alert('Toute la mémoire a été effacée.');
+            }
+        }
 
         // === INITIALISATION ===
         // Charger la mémoire au démarrage
