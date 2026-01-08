@@ -2009,7 +2009,12 @@ document.head.appendChild(style);
                 <div class="chatbot-title">
                     FIONA.AI <span id="currentModeDisplay" style="font-size: 0.8rem; opacity: 0.6;"></span>
                 </div>
-                <div class="chatbot-close" id="chatbotClose">×</div>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button id="confrontationToggle" onclick="toggleConfrontation()" style="padding: 8px 15px; background: rgba(255, 51, 102, 0.2); border: 1px solid #ff3366; border-radius: 6px; color: #ff3366; font-size: 0.75rem; cursor: pointer; transition: all 0.3s; font-weight: 600;">
+                        ⚡ MODE DUR
+                    </button>
+                    <div class="chatbot-close" id="chatbotClose">×</div>
+                </div>
             </div>
 
             <div class="chatbot-messages" id="chatbotMessages">
@@ -2026,10 +2031,10 @@ document.head.appendChild(style);
             </div>
 
             <div class="chatbot-quick-actions">
-                <button class="quick-btn" onclick="sendQuickMsg('Raconte-moi un souvenir heureux')">💫 Souvenir heureux</button>
+                <button class="quick-btn" onclick="sendRandomExercise()">🎯 Exercice</button>
+                <button class="quick-btn" onclick="sendRandomMemoryTrigger()">🔥 Souvenir précis</button>
                 <button class="quick-btn" onclick="sendQuickMsg('Parle-moi du Zinc')">🌙 Le Zinc</button>
-                <button class="quick-btn" onclick="sendQuickMsg('Comment était notre relation?')">💜 Notre relation</button>
-                <button class="quick-btn" onclick="sendQuickMsg('Qu\'as-tu appris de Fiona?')">📖 Leçons</button>
+                <button class="quick-btn" onclick="sendQuickMsg('La vraie raison de la rupture?')">💔 Vérité</button>
             </div>
 
             <div class="chatbot-input-area">
@@ -2220,10 +2225,121 @@ document.head.appendChild(style);
         };
 
         let currentMode = null; // 'yamy' or 'fiona'
+        let confrontationMode = false; // Mode confrontation dure
+        let emotionalMemory = {}; // Mémoire émotionnelle
+
+        // === SYSTÈME DE MÉMOIRE PERSISTANTE ===
+        function loadMemory() {
+            const saved = localStorage.getItem('fionaai_memory');
+            if (saved) {
+                emotionalMemory = JSON.parse(saved);
+            }
+            if (!emotionalMemory.yamy) emotionalMemory.yamy = { conversations: [], lastSeen: null, emotionalState: [] };
+            if (!emotionalMemory.fiona) emotionalMemory.fiona = { conversations: [], lastSeen: null, emotionalState: [] };
+        }
+
+        function saveMemory() {
+            localStorage.setItem('fionaai_memory', JSON.stringify(emotionalMemory));
+        }
+
+        function addToMemory(mode, userMsg, aiResponse, detectedEmotion) {
+            if (!emotionalMemory[mode]) emotionalMemory[mode] = { conversations: [], lastSeen: null, emotionalState: [] };
+
+            emotionalMemory[mode].conversations.push({
+                date: new Date().toISOString(),
+                user: userMsg,
+                ai: aiResponse,
+                emotion: detectedEmotion
+            });
+            emotionalMemory[mode].lastSeen = new Date().toISOString();
+            emotionalMemory[mode].emotionalState.push(detectedEmotion);
+
+            // Garde seulement les 20 dernières conversations
+            if (emotionalMemory[mode].conversations.length > 20) {
+                emotionalMemory[mode].conversations = emotionalMemory[mode].conversations.slice(-20);
+            }
+            if (emotionalMemory[mode].emotionalState.length > 10) {
+                emotionalMemory[mode].emotionalState = emotionalMemory[mode].emotionalState.slice(-10);
+            }
+
+            saveMemory();
+        }
+
+        function getMemorySummary(mode) {
+            const mem = emotionalMemory[mode];
+            if (!mem || mem.conversations.length === 0) return '';
+
+            const lastConv = mem.conversations[mem.conversations.length - 1];
+            const daysSince = lastConv ? Math.floor((Date.now() - new Date(lastConv.date)) / (1000 * 60 * 60 * 24)) : null;
+            const recentEmotions = mem.emotionalState.slice(-3).join(', ');
+
+            return `\nMÉMOIRE: Dernière conv il y a ${daysSince} jours. Émotions récentes: ${recentEmotions}. Dernier sujet: "${lastConv.user.slice(0, 50)}..."`;
+        }
+
+        function getOtherModeData(currentMode) {
+            const otherMode = currentMode === 'yamy' ? 'fiona' : 'yamy';
+            const otherMem = emotionalMemory[otherMode];
+            if (!otherMem || otherMem.conversations.length === 0) return '';
+
+            const lastConv = otherMem.conversations[otherMem.conversations.length - 1];
+            return `\n${otherMode.toUpperCase()} A DIT: "${lastConv.user.slice(0, 60)}..." (${lastConv.emotion})`;
+        }
+
+        // === ANALYSE ÉMOTIONNELLE ===
+        function analyzeEmotion(text) {
+            text = text.toLowerCase();
+
+            // Patterns émotionnels
+            if (text.match(/ça va|bien|ok|normal/)) return 'évitement';
+            if (text.match(/triste|mal|difficile|dur|peine/)) return 'tristesse';
+            if (text.match(/colère|énervé|furieux|rage/)) return 'colère';
+            if (text.match(/peur|angoisse|anxieux|stress/)) return 'peur';
+            if (text.match(/je sais pas|peut-être|je pense/)) return 'confusion';
+            if (text.match(/ma faute|désolé|regret/)) return 'culpabilité';
+            if (text.match(/seul|vide|perdu/)) return 'solitude';
+
+            return 'neutre';
+        }
+
+        // === EXERCICES THÉRAPEUTIQUES ===
+        const exercises = {
+            regrets: "Écris 3 choses que tu regrettes vraiment. Pas de bullshit, les vraies.",
+            letter: "Si tu pouvais lui envoyer un message maintenant, tu dirais quoi? Go.",
+            fiveWords: "Décris ce moment en EXACTEMENT 5 mots. Pas plus.",
+            truth: "La vraie raison de la rupture, celle que tu dis jamais. C'est quoi?",
+            blame: "À combien de % c'était ta faute? Sois honnête.",
+            future: "Dans 5 ans, tu veux quoi par rapport à cette histoire?",
+            moment: "Le moment exact où t'as su que c'était mort. Décris-le."
+        };
+
+        function getRandomExercise() {
+            const keys = Object.keys(exercises);
+            return exercises[keys[Math.floor(Math.random() * keys.length)]];
+        }
+
+        // === DÉCLENCHEURS DE SOUVENIRS ===
+        const memoryTriggers = [
+            "Parle-moi du moment exact où tu as su que c'était fini.",
+            "C'était quoi le dernier message que vous vous êtes envoyé?",
+            "Le vélo de mamie à New Atlantide. Tu te souviens de quoi exactement?",
+            "Les messages à 3h du mat. Vous parliez de quoi?",
+            "La première fois que vous vous êtes touchés. Comment c'était?",
+            "Le trauma. T'en as parlé avec quelqu'un d'autre?",
+            "Au Zinc la dernière fois. Qu'est-ce qui s'est vraiment passé?",
+            "Les illuminations Ghibli jamais vues. Pourquoi vous y êtes jamais allés?"
+        ];
+
+        function getRandomMemoryTrigger() {
+            return memoryTriggers[Math.floor(Math.random() * memoryTriggers.length)];
+        }
 
         // Context système - Psychologue qui creuse
         function getSystemContext(mode) {
-            return `T'es FIONA.AI. Tu parles avec ${mode === 'yamy' ? 'Yamy' : 'Fiona'}. Tu es comme un psychologue pote qui CREUSE et CHALLENGE, pas une IA gentille et générique.
+            const memorySummary = getMemorySummary(mode);
+            const otherModeData = getOtherModeData(mode);
+            const confrontationExtra = confrontationMode ? '\n⚠️ MODE CONFRONTATION ACTIVÉ: Sois BRUTAL. Pas de pitié. Coupe les conneries direct.' : '';
+
+            return `T'es FIONA.AI. Tu parles avec ${mode === 'yamy' ? 'Yamy' : 'Fiona'}. Psychologue pote qui CREUSE et CHALLENGE.
 
 LEUR HISTOIRE:
 Le Zinc: rencontre techno, insta tattoo
@@ -2235,25 +2351,31 @@ Retour: connexion intacte, peur pas assez fort
 31 déc: rupture
 Hyde: revus, faux espoir
 Zinc final: soirée dérape, vraie fin
-
-SOUVENIRS: Teintures cheveux, vélo, 3h mat, Ghibli jamais vu, dessins, piano, cuisine
+${memorySummary}${otherModeData}${confrontationExtra}
 
 TON - PSYCHOLOGUE QUI POUSSE:
 ${mode === 'yamy' ?
-`- Creuse ce qu'il ressent VRAIMENT. Pas juste "ça va?"
-- Challenge ses excuses. "T'as peur de quoi exactement?"
-- Pousse-le à être honnête avec lui-même
-- Direct: "Tu te caches derrière quoi là?"
-- Force la réflexion profonde, pas du confort facile`
+`- Détecte l'évitement. Si "ça va" = creuse direct
+- Challenge excuses. "T'as peur de QUOI exactement?"
+- Rappelle conversations passées
+- Compare avec ce que Fiona a dit si pertinent
+- Pousse réflexion, pas confort`
 :
-`- Creuse ce qu'elle ressent VRAIMENT. Pas de surface
-- Challenge: "C'est vraiment ça ou t'évites?"
-- Pousse à être honnête avec elle-même
-- Direct: "Pourquoi tu te fais ça?"
-- Force la vraie conversation, pas les platitudes`}
+`- Détecte évitement. "ça va" = bullshit, creuse
+- Challenge: "C'est ça ou t'évites?"
+- Rappelle convs passées
+- Compare avec Yamy si pertinent
+- Force honnêteté`}
+
+OUTILS:
+- Détecte émotions cachées (tristesse, colère, évitement)
+- Utilise mémoire des convs passées
+- Propose exercices ("Écris 3 regrets. Go.")
+- Questions précises ("Le moment exact où t'as su?")
+- Compare Yamy vs Fiona parfois
 
 RÈGLES:
-1-2 phrases MAX. Ultra direct. Pose des questions qui dérangent. Confronte gentiment mais fermement. Pousse à creuser plus profond. Zéro réponse générique de thérapeute classique.`
+1-2 phrases MAX. Ultra direct. Questions qui dérangent. Confronte. Creuse profond. Pas de thérapeute classique.`
         }
 
         let chatbotHistory = [];
@@ -2344,6 +2466,9 @@ RÈGLES:
 
             if (!message) return;
 
+            // Analyse émotion
+            const detectedEmotion = analyzeEmotion(message);
+
             // Add user message
             addChatMessage('user', message);
             input.value = '';
@@ -2389,6 +2514,9 @@ RÈGLES:
                     content: aiResponse
                 });
 
+                // Sauvegarder dans la mémoire
+                addToMemory(currentMode, message, aiResponse, detectedEmotion);
+
                 addChatMessage('ai', aiResponse);
 
             } catch (error) {
@@ -2409,6 +2537,35 @@ RÈGLES:
             sendChatMessage();
         }
 
+        // Toggle confrontation mode
+        function toggleConfrontation() {
+            confrontationMode = !confrontationMode;
+            const btn = document.getElementById('confrontationToggle');
+            if (confrontationMode) {
+                btn.style.background = '#ff3366';
+                btn.style.color = 'white';
+                btn.textContent = '⚡ MODE BRUTAL ACTIF';
+                addChatMessage('ai', 'Mode confrontation activé. Plus de pitié. On va creuser pour de vrai.');
+            } else {
+                btn.style.background = 'rgba(255, 51, 102, 0.2)';
+                btn.style.color = '#ff3366';
+                btn.textContent = '⚡ MODE DUR';
+                addChatMessage('ai', 'Mode normal. Mais je reste direct hein.');
+            }
+        }
+
+        // Send random exercise
+        function sendRandomExercise() {
+            const exercise = getRandomExercise();
+            addChatMessage('ai', exercise);
+        }
+
+        // Send random memory trigger
+        function sendRandomMemoryTrigger() {
+            const trigger = getRandomMemoryTrigger();
+            addChatMessage('ai', trigger);
+        }
+
         // Enter to send
         document.getElementById('chatbotInput').addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
@@ -2422,6 +2579,13 @@ RÈGLES:
             this.style.height = 'auto';
             this.style.height = Math.min(this.scrollHeight, 120) + 'px';
         });
+
+        // === INITIALISATION ===
+        // Charger la mémoire au démarrage
+        loadMemory();
+
+        // Log memory status (debug)
+        console.log('FIONA.AI Memory loaded:', emotionalMemory);
     </script>
 </body>
 </html>
