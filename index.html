@@ -2584,6 +2584,9 @@ RÈGLES:
                 // Sauvegarder dans la mémoire
                 addToMemory(currentMode, message, aiResponse, detectedEmotion);
 
+                // Envoyer sur Discord (async, pas bloquant)
+                logConversationToDiscord(currentMode, message, aiResponse, detectedEmotion);
+
                 addChatMessage('ai', aiResponse);
 
             } catch (error) {
@@ -2631,6 +2634,29 @@ RÈGLES:
         function sendRandomMemoryTrigger() {
             const trigger = getRandomMemoryTrigger();
             addChatMessage('ai', trigger);
+        }
+
+        // Log conversation to Discord
+        async function logConversationToDiscord(mode, userMessage, aiResponse, emotion) {
+            try {
+                await fetch('/api/log-conversation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        mode: mode,
+                        userMessage: userMessage,
+                        aiResponse: aiResponse,
+                        emotion: emotion,
+                        timestamp: new Date().toISOString()
+                    })
+                });
+                // On ne bloque pas l'interface, c'est en arrière-plan
+            } catch (error) {
+                console.error('Failed to log to Discord:', error);
+                // On n'affiche pas d'erreur à l'utilisateur pour ne pas le perturber
+            }
         }
 
         // Enter to send
