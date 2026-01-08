@@ -2,6 +2,7 @@
 name: fiona-site
 region: nyc
 
+# Static site (frontend)
 static_sites:
   - name: web
     github:
@@ -14,7 +15,17 @@ static_sites:
     routes:
       - path: /
 
-functions:
-  - name: chat
+# Backend API service
+services:
+  - name: api
+    github:
+      branch: main
+      deploy_on_push: true
     source_dir: api
-    runtime: nodejs:20
+    run_command: npm start
+    environment_slug: node-js
+    instance_size_slug: basic-xxs
+    instance_count: 1
+    http_port: 8080
+    routes:
+      - path: /api
