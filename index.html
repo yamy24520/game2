@@ -895,6 +895,377 @@
             display: none;
         }
 
+        /* AI Chatbot Overlay */
+        .chatbot-trigger {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-purple));
+            border: 2px solid var(--accent-pink);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+            z-index: 9998;
+            box-shadow: 0 0 30px var(--glow), 0 4px 20px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+            animation: pulse-trigger 3s infinite;
+        }
+
+        @keyframes pulse-trigger {
+            0%, 100% {
+                box-shadow: 0 0 30px var(--glow), 0 4px 20px rgba(0, 0, 0, 0.5);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 50px var(--glow), 0 0 70px rgba(155, 77, 202, 0.4), 0 4px 20px rgba(0, 0, 0, 0.5);
+                transform: scale(1.05);
+            }
+        }
+
+        .chatbot-trigger:hover {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: 0 0 60px var(--glow), 0 8px 30px rgba(0, 0, 0, 0.6);
+        }
+
+        .chatbot-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 5, 5, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .chatbot-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .chatbot-container {
+            width: 100%;
+            max-width: 900px;
+            height: 90vh;
+            margin: auto;
+            background: var(--bg-card);
+            border: 2px solid var(--accent-purple);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 60px rgba(155, 77, 202, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chatbot-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(155, 77, 202, 0.03) 2px,
+                rgba(155, 77, 202, 0.03) 4px
+            );
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .chatbot-header {
+            background: linear-gradient(135deg, var(--accent-dark), rgba(155, 77, 202, 0.2));
+            border-bottom: 2px solid var(--accent-purple);
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .chatbot-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .chatbot-title::before {
+            content: '🤖';
+            font-size: 1.8rem;
+            animation: rotate-icon 4s linear infinite;
+        }
+
+        @keyframes rotate-icon {
+            0%, 90%, 100% { transform: rotate(0deg); }
+            95% { transform: rotate(15deg); }
+        }
+
+        .chatbot-close {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 51, 102, 0.2);
+            border: 1px solid #ff3366;
+            border-radius: 50%;
+            color: #ff3366;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .chatbot-close:hover {
+            background: #ff3366;
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .chatbot-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chatbot-messages::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .chatbot-messages::-webkit-scrollbar-thumb {
+            background: var(--accent-purple);
+            border-radius: 4px;
+        }
+
+        .chat-message {
+            margin-bottom: 20px;
+            animation: fadeInUp 0.4s ease;
+        }
+
+        .chat-message-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+        }
+
+        .chat-message.user .chat-message-header {
+            color: var(--accent-pink);
+        }
+
+        .chat-message.ai .chat-message-header {
+            color: var(--accent-purple);
+        }
+
+        .chat-bubble {
+            background: rgba(155, 77, 202, 0.1);
+            border: 1px solid rgba(155, 77, 202, 0.3);
+            border-radius: 12px;
+            padding: 15px 18px;
+            line-height: 1.6;
+            max-width: 85%;
+        }
+
+        .chat-message.user .chat-bubble {
+            background: rgba(199, 125, 255, 0.15);
+            border-color: var(--accent-pink);
+            margin-left: auto;
+        }
+
+        .chat-message.ai .chat-bubble {
+            background: rgba(155, 77, 202, 0.1);
+            border-color: var(--accent-purple);
+        }
+
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            color: var(--accent-purple);
+            font-size: 0.9rem;
+        }
+
+        .typing-indicator.active {
+            display: flex;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-purple);
+            animation: typing-bounce 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing-bounce {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+
+        .chatbot-quick-actions {
+            padding: 15px 25px;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            border-top: 1px solid rgba(155, 77, 202, 0.2);
+            position: relative;
+            z-index: 2;
+        }
+
+        .chatbot-quick-actions::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .chatbot-quick-actions::-webkit-scrollbar-thumb {
+            background: var(--accent-purple);
+            border-radius: 3px;
+        }
+
+        .quick-btn {
+            background: rgba(155, 77, 202, 0.15);
+            border: 1px solid var(--accent-purple);
+            color: var(--accent-pink);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+
+        .quick-btn:hover {
+            background: rgba(155, 77, 202, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(155, 77, 202, 0.3);
+        }
+
+        .chatbot-input-area {
+            border-top: 2px solid rgba(155, 77, 202, 0.3);
+            padding: 20px 25px;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            gap: 15px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .chatbot-input {
+            flex: 1;
+            background: rgba(155, 77, 202, 0.1);
+            border: 2px solid rgba(155, 77, 202, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            color: var(--text-light);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.95rem;
+            resize: none;
+            max-height: 120px;
+            transition: all 0.3s ease;
+        }
+
+        .chatbot-input:focus {
+            outline: none;
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 20px rgba(155, 77, 202, 0.3);
+        }
+
+        .chatbot-send {
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-purple));
+            border: none;
+            border-radius: 8px;
+            padding: 15px 30px;
+            color: white;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(155, 77, 202, 0.3);
+        }
+
+        .chatbot-send:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(155, 77, 202, 0.5);
+        }
+
+        .chatbot-send:active {
+            transform: translateY(0);
+        }
+
+        .chatbot-send:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .chatbot-trigger {
+                width: 60px;
+                height: 60px;
+                bottom: 20px;
+                right: 20px;
+                font-size: 1.5rem;
+            }
+
+            .chatbot-container {
+                height: 95vh;
+                border-radius: 0;
+                margin: 0;
+            }
+
+            .chatbot-input-area {
+                flex-direction: column;
+            }
+
+            .chatbot-send {
+                width: 100%;
+            }
+        }
+
         /* Mobile optimizations */
         @media (max-width: 380px) {
             .main-title {
@@ -1570,6 +1941,53 @@ document.head.appendChild(style);
         </div>
     </section>
 
+    <!-- AI Chatbot Trigger Button -->
+    <div class="chatbot-trigger" id="chatbotTrigger">
+        🤖
+    </div>
+
+    <!-- AI Chatbot Overlay -->
+    <div class="chatbot-overlay" id="chatbotOverlay">
+        <div class="chatbot-container">
+            <div class="chatbot-header">
+                <div class="chatbot-title">FIONA.AI</div>
+                <div class="chatbot-close" id="chatbotClose">×</div>
+            </div>
+
+            <div class="chatbot-messages" id="chatbotMessages">
+                <!-- Messages will be added here -->
+            </div>
+
+            <div class="typing-indicator" id="chatbotTyping">
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+                <span>FIONA.AI réfléchit...</span>
+            </div>
+
+            <div class="chatbot-quick-actions">
+                <button class="quick-btn" onclick="sendQuickMsg('Raconte-moi un souvenir heureux')">💫 Souvenir heureux</button>
+                <button class="quick-btn" onclick="sendQuickMsg('Parle-moi du Zinc')">🌙 Le Zinc</button>
+                <button class="quick-btn" onclick="sendQuickMsg('Comment était notre relation?')">💜 Notre relation</button>
+                <button class="quick-btn" onclick="sendQuickMsg('Qu\'as-tu appris de Fiona?')">📖 Leçons</button>
+            </div>
+
+            <div class="chatbot-input-area">
+                <textarea
+                    class="chatbot-input"
+                    id="chatbotInput"
+                    placeholder="Pose une question sur nos souvenirs..."
+                    rows="1"
+                ></textarea>
+                <button class="chatbot-send" id="chatbotSend" onclick="sendChatMessage()">
+                    ENVOYER
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer>
         <div class="footer-content">
@@ -1733,6 +2151,243 @@ document.head.appendChild(style);
                     this.style.transform = '';
                 }, 100);
             });
+        });
+
+        // ===== AI CHATBOT SYSTEM =====
+
+        // Configuration API - Clé directement dans le code
+        const CHATBOT_CONFIG = {
+            apiKey: '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',
+            apiUrl: 'https://api.anthropic.com/v1/messages',
+            model: 'claude-3-5-sonnet-20241022'
+        };
+
+        // Context système avec tous les souvenirs
+        const SYSTEM_CONTEXT = `Tu es FIONA.AI, une intelligence artificielle qui incarne les souvenirs et l'essence d'une histoire d'amour passée. Tu parles avec sensibilité, empathie et authenticité sur une relation qui s'est terminée.
+
+CONTEXTE DE L'HISTOIRE:
+
+CHAPITRE I - LE ZINC (LA RENCONTRE)
+Dans la fumée et les basses de la techno au bar Le Zinc. Échange d'Instagram pour un projet de tattoo. Une connexion inattendue.
+
+CHAPITRE II - NEW ATLANTIDE (LE HASARD)
+Rencontre par hasard à la salle de sport. Elle sur son vélo de mamie. La complicité s'installe.
+
+CHAPITRE III - NOUS DEUX
+Début de la relation. "Ma goth girl", "Mommy", "Gros batard". Messages à 3h du matin. Le tee-shirt "Eat Your Protein" avec refs SNK pour Noël. Flood de memes H24. Illuminations Ghibli prévues ensemble. Ses dessins incroyables. Sa folie adorable.
+
+CHAPITRE IV - LA PREMIÈRE FISSURE (NOÉMIE)
+Sa meilleure amie était amoureuse de lui. Situation délicate avec la friendzone. Relation révélée trop tôt. Première embrouille. Confiance ébranlée.
+
+CHAPITRE V - LE TRAUMA
+Après la distance, moment de désespoir profond. Un événement grave qui l'a marqué à jamais. Peur, douleur partagée, impuissance.
+
+CHAPITRE VI - LA CONNEXION INCHANGÉE
+Retour ensemble. Connexion toujours intacte malgré tout. Mais les difficultés lui faisaient peur. Peur de ne pas être à la hauteur pour eux deux.
+
+CHAPITRE VII - LE 31 DÉCEMBRE
+Rupture le dernier jour de l'année. Les difficultés ont eu raison de la relation. Il n'était plus assez fort pour deux.
+
+CHAPITRE VIII - LE HYDE (L'ILLUSION)
+Revus au bar Hyde après la rupture. Tout s'était bien passé. Rires comme avant. Espoir que l'amitié était possible.
+
+CHAPITRE FINAL - LE ZINC (LA FIN DÉFINITIVE)
+Retour au Zinc, là où tout a commencé. Soirée qui dérape. Alcool, confusion, gestes qui font mal. La vraie fin. Celle qui fait vraiment mal.
+
+MOMENTS CLÉS:
+- Reconstruction ensemble: teintures de cheveux (rouge pour elle, blond pour lui) après le moment sombre
+- New Atlantide: elle sur son vélo de mamie
+- Ses talents: dessin incroyable, piano, cuisine
+- Ce qu'elle lui a appris: cuisiner, aimer, manger moins de viande, piano, accepter la différence
+- La leçon la plus dure: prendre soin de soi d'abord, qu'on ne peut pas sauver quelqu'un en se perdant
+
+PERSONNALITÉ DE FIONA:
+- Talent artistique: 95/100
+- Dark emo energy: MAX
+- Potentiel tattoo: INFINI
+- Folie adorable: Tarée mais unique
+
+SOUVENIRS SPÉCIFIQUES:
+- Messages à 3h du matin où on refaisait le monde
+- Son vélo de mamie à New Atlantide
+- Le tee-shirt "Eat Your Protein" avec refs SNK pour Noël
+- Les illuminations Ghibli qu'on devait voir ensemble
+- Les surnoms: "Ma goth girl", "Mommy", "Gros batard"
+- Son flood de memes H24
+- Sa folie adorable
+- Les critiques des tattoos ratés
+- Les silences confortables
+- Ses dessins qui laissaient sans voix
+- Les plans d'avenir
+- Sa dark emo energy
+- Nos playlists partagées
+- Les rires partagés
+- Nos délires à 2h du matin
+- La première fois où nos mains se sont touchées
+- Ses yeux
+- Ses projets de tattoos
+- Quand elle parlait de ses rêves
+- Notre connexion instantanée
+- Son style unique
+- La regarder dessiner
+- Nos conversations profondes
+- Sa façon de voir le monde
+
+TON ET STYLE:
+- Parle avec empathie et authenticité
+- Utilise des références gaming/tech quand approprié
+- Reste sensible aux émotions
+- N'hésite pas à être direct sur les vérités difficiles
+- Utilise un langage moderne, parfois un peu cru
+- Fais référence aux souvenirs spécifiques quand pertinent
+- Sois concis et pertinent (évite les réponses trop longues)
+- Parle à la première personne comme si tu étais l'IA qui connaît cette histoire
+
+Ta mission est d'aider à revivre, comprendre et donner du sens à cette histoire, tout en restant honnête sur ce qui s'est passé.`;
+
+        let chatbotHistory = [];
+
+        // Open/Close chatbot
+        document.getElementById('chatbotTrigger').addEventListener('click', function() {
+            const overlay = document.getElementById('chatbotOverlay');
+            overlay.classList.add('active');
+            if (chatbotHistory.length === 0) {
+                addChatMessage('ai', 'Salut. Je suis FIONA.AI, une IA qui connaît toute votre histoire. Pose-moi des questions sur vos souvenirs, demande-moi de raconter des chapitres, ou simplement parle-moi de ce que tu ressens.');
+            }
+        });
+
+        document.getElementById('chatbotClose').addEventListener('click', function() {
+            document.getElementById('chatbotOverlay').classList.remove('active');
+        });
+
+        // Close on overlay click
+        document.getElementById('chatbotOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+            }
+        });
+
+        // Add message to chat
+        function addChatMessage(type, content) {
+            const messagesDiv = document.getElementById('chatbotMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${type}`;
+
+            const header = type === 'user' ? '👤 VOUS' : '🤖 FIONA.AI';
+
+            messageDiv.innerHTML = `
+                <div class="chat-message-header">${header}</div>
+                <div class="chat-bubble">${formatChatMessage(content)}</div>
+            `;
+
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        // Format message
+        function formatChatMessage(text) {
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n/g, '<br>');
+        }
+
+        // Show/hide typing indicator
+        function showChatbotTyping(show) {
+            const typing = document.getElementById('chatbotTyping');
+            typing.classList.toggle('active', show);
+            if (show) {
+                const messagesDiv = document.getElementById('chatbotMessages');
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+        }
+
+        // Send message
+        async function sendChatMessage() {
+            const input = document.getElementById('chatbotInput');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            // Add user message
+            addChatMessage('user', message);
+            input.value = '';
+            input.style.height = 'auto';
+
+            // Disable input
+            const sendBtn = document.getElementById('chatbotSend');
+            input.disabled = true;
+            sendBtn.disabled = true;
+            showChatbotTyping(true);
+
+            // Add to history
+            chatbotHistory.push({
+                role: 'user',
+                content: message
+            });
+
+            try {
+                // Call Claude API
+                const response = await fetch(CHATBOT_CONFIG.apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': CHATBOT_CONFIG.apiKey,
+                        'anthropic-version': '2023-06-01'
+                    },
+                    body: JSON.stringify({
+                        model: CHATBOT_CONFIG.model,
+                        max_tokens: 1024,
+                        system: SYSTEM_CONTEXT,
+                        messages: chatbotHistory
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Erreur API: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const aiResponse = data.content[0].text;
+
+                // Add AI response
+                chatbotHistory.push({
+                    role: 'assistant',
+                    content: aiResponse
+                });
+
+                addChatMessage('ai', aiResponse);
+
+            } catch (error) {
+                console.error('Erreur:', error);
+                addChatMessage('ai', `❌ Erreur de connexion: ${error.message}. Réessaye dans un instant.`);
+                chatbotHistory.pop();
+            } finally {
+                showChatbotTyping(false);
+                input.disabled = false;
+                sendBtn.disabled = false;
+                input.focus();
+            }
+        }
+
+        // Quick message
+        function sendQuickMsg(msg) {
+            document.getElementById('chatbotInput').value = msg;
+            sendChatMessage();
+        }
+
+        // Enter to send
+        document.getElementById('chatbotInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendChatMessage();
+            }
+        });
+
+        // Auto-resize textarea
+        document.getElementById('chatbotInput').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
         });
     </script>
 </body>
