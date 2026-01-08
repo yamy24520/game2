@@ -1,0 +1,2394 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FIONA. | The Last Chapter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Share+Tech+Mono&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #050505;
+            --bg-card: #0a0a0a;
+            --text-light: #e8e6e3;
+            --text-muted: #8a8a8a;
+            --accent-purple: #9b4dca;
+            --accent-violet: #7b2cbf;
+            --accent-pink: #c77dff;
+            --accent-dark: #3c096c;
+            --glow: rgba(155, 77, 202, 0.5);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Scanlines overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.1) 2px,
+                rgba(0, 0, 0, 0.1) 4px
+            );
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-dark);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loading-text {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.2rem;
+            color: var(--accent-purple);
+            margin-bottom: 30px;
+            animation: flicker 0.5s infinite;
+        }
+
+        .loading-bar-container {
+            width: 250px;
+            height: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--accent-purple);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .loading-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-violet), var(--accent-pink));
+            box-shadow: 0 0 20px var(--glow);
+            transition: width 0.3s ease;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 50% 0%, rgba(123, 44, 191, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 80%, rgba(155, 77, 202, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--accent-purple);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: float 15s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.6;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .hero-content {
+            text-align: center;
+            z-index: 10;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s ease forwards;
+            animation-delay: 0.5s;
+        }
+
+        .level-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            background: linear-gradient(135deg, var(--accent-dark), transparent);
+            border: 1px solid var(--accent-purple);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+            animation: pulse-border 2s infinite;
+        }
+
+        @keyframes pulse-border {
+            0%, 100% {
+                box-shadow: 0 0 5px var(--glow);
+            }
+            50% {
+                box-shadow: 0 0 20px var(--glow), 0 0 40px rgba(155, 77, 202, 0.3);
+            }
+        }
+
+        .main-title {
+            font-family: 'UnifrakturMaguntia', cursive;
+            font-size: clamp(4rem, 15vw, 8rem);
+            color: var(--text-light);
+            text-shadow: 
+                0 0 10px var(--glow),
+                0 0 30px rgba(155, 77, 202, 0.3),
+                0 0 60px rgba(155, 77, 202, 0.2);
+            margin-bottom: 10px;
+            position: relative;
+            animation: glitch-text 3s infinite;
+        }
+
+        .main-title::after {
+            content: '_';
+            animation: blink 1s infinite;
+            color: var(--accent-pink);
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        @keyframes glitch-text {
+            0%, 90%, 100% {
+                transform: translate(0);
+                text-shadow: 
+                    0 0 10px var(--glow),
+                    0 0 30px rgba(155, 77, 202, 0.3);
+            }
+            92% {
+                transform: translate(-2px, 1px);
+                text-shadow: 
+                    2px 0 var(--accent-pink),
+                    -2px 0 cyan;
+            }
+            94% {
+                transform: translate(2px, -1px);
+                text-shadow: 
+                    -2px 0 var(--accent-pink),
+                    2px 0 cyan;
+            }
+            96% {
+                transform: translate(0);
+            }
+        }
+
+        .subtitle-container {
+            height: 30px;
+            margin-bottom: 40px;
+            overflow: hidden;
+        }
+
+        .subtitle {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1rem;
+            color: var(--accent-pink);
+            letter-spacing: 2px;
+        }
+
+        .typed-text::after {
+            content: '|';
+            animation: blink 0.7s infinite;
+        }
+
+        .xp-bar-container {
+            width: 200px;
+            margin: 0 auto 40px;
+        }
+
+        .xp-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        .xp-bar {
+            height: 6px;
+            background: var(--bg-card);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .xp-fill {
+            height: 100%;
+            width: 69%;
+            background: linear-gradient(90deg, var(--accent-violet), var(--accent-pink));
+            border-radius: 3px;
+            animation: xp-glow 2s infinite;
+        }
+
+        @keyframes xp-glow {
+            0%, 100% { box-shadow: 0 0 5px var(--glow); }
+            50% { box-shadow: 0 0 15px var(--glow); }
+        }
+
+        .enter-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 18px 40px;
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-purple));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 30px rgba(155, 77, 202, 0.4);
+        }
+
+        .enter-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .enter-btn:hover::before {
+            left: 100%;
+        }
+
+        .enter-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 40px rgba(155, 77, 202, 0.6);
+        }
+
+        .enter-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-icon {
+            font-size: 1.2rem;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+            opacity: 0.6;
+        }
+
+        .scroll-indicator span {
+            display: block;
+            width: 20px;
+            height: 20px;
+            border-right: 2px solid var(--accent-purple);
+            border-bottom: 2px solid var(--accent-purple);
+            transform: rotate(45deg);
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(10px); }
+            60% { transform: translateX(-50%) translateY(5px); }
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Section Styles */
+        section {
+            padding: 60px 20px;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .section-tag {
+            display: inline-block;
+            padding: 6px 15px;
+            background: rgba(155, 77, 202, 0.1);
+            border: 1px solid var(--accent-purple);
+            border-radius: 4px;
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent-pink);
+            margin-bottom: 15px;
+        }
+
+        .section-title {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(1.8rem, 8vw, 2.5rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-light), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Quest Timeline */
+        .quest-section {
+            background: linear-gradient(180deg, transparent, rgba(60, 9, 108, 0.1), transparent);
+        }
+
+        .timeline {
+            position: relative;
+            max-width: 400px;
+            margin: 0 auto;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--accent-purple), var(--accent-pink), var(--accent-purple));
+            box-shadow: 0 0 10px var(--glow);
+        }
+
+        .quest-item {
+            position: relative;
+            margin-bottom: 40px;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: all 0.6s ease;
+        }
+
+        .quest-item.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .quest-marker {
+            position: absolute;
+            left: -30px;
+            top: 5px;
+            width: 20px;
+            height: 20px;
+            background: var(--bg-dark);
+            border: 2px solid var(--accent-purple);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            z-index: 2;
+            box-shadow: 0 0 15px var(--glow);
+        }
+
+        .quest-marker.completed {
+            background: var(--accent-purple);
+            animation: pulse-marker 2s infinite;
+        }
+
+        @keyframes pulse-marker {
+            0%, 100% { box-shadow: 0 0 10px var(--glow); }
+            50% { box-shadow: 0 0 25px var(--glow), 0 0 40px rgba(155, 77, 202, 0.3); }
+        }
+
+        .quest-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(155, 77, 202, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quest-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-violet), var(--accent-pink));
+        }
+
+        .quest-status {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(155, 77, 202, 0.2);
+            border-radius: 4px;
+            font-size: 0.65rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--accent-pink);
+            margin-bottom: 10px;
+        }
+
+        .quest-status.active {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            animation: status-pulse 1.5s infinite;
+        }
+
+        @keyframes status-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .quest-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+
+        .quest-location {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .quest-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .quest-reward {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(155, 77, 202, 0.2);
+            font-size: 0.75rem;
+            color: var(--accent-pink);
+        }
+
+        /* Stats Section */
+        .stats-section {
+            background: var(--bg-card);
+            border-top: 1px solid rgba(155, 77, 202, 0.2);
+            border-bottom: 1px solid rgba(155, 77, 202, 0.2);
+        }
+
+        .stats-grid {
+            display: grid;
+            gap: 15px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .stat-card {
+            background: rgba(155, 77, 202, 0.05);
+            border: 1px solid rgba(155, 77, 202, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: var(--accent-purple);
+            transform: translateX(5px);
+            box-shadow: -5px 0 20px rgba(155, 77, 202, 0.2);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-purple));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .stat-info {
+            flex: 1;
+        }
+
+        .stat-name {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .stat-bar {
+            height: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+
+        .stat-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+
+        .stat-fill.talent { 
+            width: 95%; 
+            background: linear-gradient(90deg, #ff6b6b, #ffa500);
+        }
+        .stat-fill.style { 
+            width: 100%; 
+            background: linear-gradient(90deg, var(--accent-violet), var(--accent-pink));
+        }
+        .stat-fill.potential { 
+            width: 200%; 
+            background: linear-gradient(90deg, #00ff88, #00d4ff);
+        }
+        .stat-fill.charisma { 
+            width: 88%; 
+            background: linear-gradient(90deg, #ff00ff, #ff69b4);
+        }
+
+        .stat-value {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            text-align: right;
+        }
+
+        /* Confidence Boost Section */
+        .boost-section {
+            position: relative;
+        }
+
+        .boost-card {
+            max-width: 400px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, rgba(123, 44, 191, 0.1), rgba(155, 77, 202, 0.05));
+            border: 1px solid rgba(155, 77, 202, 0.3);
+            border-radius: 16px;
+            padding: 30px 25px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .boost-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(155, 77, 202, 0.1) 0%, transparent 70%);
+            animation: rotate-bg 20s linear infinite;
+        }
+
+        @keyframes rotate-bg {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .boost-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .boost-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.3rem;
+            color: var(--text-light);
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .boost-text {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+            position: relative;
+            z-index: 1;
+        }
+
+        .boost-text strong {
+            color: var(--accent-pink);
+        }
+
+        .achievement-popup {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: #00ff88;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Gallery Section */
+        .gallery-section {
+            background: linear-gradient(180deg, transparent, rgba(60, 9, 108, 0.1));
+        }
+
+        .gallery-container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .gallery-scroll {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding: 20px 0;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .gallery-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .gallery-item {
+            flex: 0 0 280px;
+            scroll-snap-align: center;
+            background: var(--bg-card);
+            border: 1px solid rgba(155, 77, 202, 0.3);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .gallery-item:hover {
+            border-color: var(--accent-purple);
+            transform: scale(1.02);
+        }
+
+        .gallery-preview {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, var(--bg-dark), var(--accent-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gallery-preview::before {
+            content: '';
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            background: 
+                radial-gradient(circle at 30% 30%, rgba(155, 77, 202, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 70% 70%, rgba(199, 125, 255, 0.2) 0%, transparent 50%);
+            animation: morph 10s ease-in-out infinite;
+        }
+
+        @keyframes morph {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.1); }
+        }
+
+        .gallery-icon {
+            font-size: 4rem;
+            position: relative;
+            z-index: 1;
+            opacity: 0.8;
+        }
+
+        .gallery-info {
+            padding: 20px;
+        }
+
+        .gallery-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(155, 77, 202, 0.2);
+            border-radius: 4px;
+            font-size: 0.65rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--accent-pink);
+            margin-bottom: 10px;
+        }
+
+        .gallery-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+
+        .gallery-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .gallery-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: rgba(155, 77, 202, 0.3);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background: var(--accent-purple);
+            box-shadow: 0 0 10px var(--glow);
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px 20px;
+            text-align: center;
+            border-top: 1px solid rgba(155, 77, 202, 0.2);
+        }
+
+        .footer-content {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .footer-logo {
+            font-family: 'UnifrakturMaguntia', cursive;
+            font-size: 2rem;
+            color: var(--accent-purple);
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px var(--glow);
+        }
+
+        .footer-text {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .footer-quote {
+            font-style: italic;
+            color: var(--accent-pink);
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        .footer-credit {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            opacity: 0.7;
+        }
+
+        .heart {
+            color: var(--accent-pink);
+            animation: heartbeat 1.5s infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* Animations */
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Utilities */
+        .hidden {
+            display: none;
+        }
+
+        /* AI Chatbot Overlay */
+        .chatbot-trigger {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-purple));
+            border: 2px solid var(--accent-pink);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+            z-index: 9998;
+            box-shadow: 0 0 30px var(--glow), 0 4px 20px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+            animation: pulse-trigger 3s infinite;
+        }
+
+        @keyframes pulse-trigger {
+            0%, 100% {
+                box-shadow: 0 0 30px var(--glow), 0 4px 20px rgba(0, 0, 0, 0.5);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 50px var(--glow), 0 0 70px rgba(155, 77, 202, 0.4), 0 4px 20px rgba(0, 0, 0, 0.5);
+                transform: scale(1.05);
+            }
+        }
+
+        .chatbot-trigger:hover {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: 0 0 60px var(--glow), 0 8px 30px rgba(0, 0, 0, 0.6);
+        }
+
+        .chatbot-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 5, 5, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .chatbot-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .chatbot-container {
+            width: 100%;
+            max-width: 900px;
+            height: 90vh;
+            margin: auto;
+            background: var(--bg-card);
+            border: 2px solid var(--accent-purple);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 60px rgba(155, 77, 202, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chatbot-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(155, 77, 202, 0.03) 2px,
+                rgba(155, 77, 202, 0.03) 4px
+            );
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .chatbot-header {
+            background: linear-gradient(135deg, var(--accent-dark), rgba(155, 77, 202, 0.2));
+            border-bottom: 2px solid var(--accent-purple);
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .chatbot-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .chatbot-title::before {
+            content: '🤖';
+            font-size: 1.8rem;
+            animation: rotate-icon 4s linear infinite;
+        }
+
+        @keyframes rotate-icon {
+            0%, 90%, 100% { transform: rotate(0deg); }
+            95% { transform: rotate(15deg); }
+        }
+
+        .chatbot-close {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 51, 102, 0.2);
+            border: 1px solid #ff3366;
+            border-radius: 50%;
+            color: #ff3366;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .chatbot-close:hover {
+            background: #ff3366;
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .chatbot-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chatbot-messages::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .chatbot-messages::-webkit-scrollbar-thumb {
+            background: var(--accent-purple);
+            border-radius: 4px;
+        }
+
+        .chat-message {
+            margin-bottom: 20px;
+            animation: fadeInUp 0.4s ease;
+        }
+
+        .chat-message-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+        }
+
+        .chat-message.user .chat-message-header {
+            color: var(--accent-pink);
+        }
+
+        .chat-message.ai .chat-message-header {
+            color: var(--accent-purple);
+        }
+
+        .chat-bubble {
+            background: rgba(155, 77, 202, 0.1);
+            border: 1px solid rgba(155, 77, 202, 0.3);
+            border-radius: 12px;
+            padding: 15px 18px;
+            line-height: 1.6;
+            max-width: 85%;
+        }
+
+        .chat-message.user .chat-bubble {
+            background: rgba(199, 125, 255, 0.15);
+            border-color: var(--accent-pink);
+            margin-left: auto;
+        }
+
+        .chat-message.ai .chat-bubble {
+            background: rgba(155, 77, 202, 0.1);
+            border-color: var(--accent-purple);
+        }
+
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            color: var(--accent-purple);
+            font-size: 0.9rem;
+        }
+
+        .typing-indicator.active {
+            display: flex;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-purple);
+            animation: typing-bounce 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing-bounce {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+
+        .chatbot-quick-actions {
+            padding: 15px 25px;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            border-top: 1px solid rgba(155, 77, 202, 0.2);
+            position: relative;
+            z-index: 2;
+        }
+
+        .chatbot-quick-actions::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .chatbot-quick-actions::-webkit-scrollbar-thumb {
+            background: var(--accent-purple);
+            border-radius: 3px;
+        }
+
+        .quick-btn {
+            background: rgba(155, 77, 202, 0.15);
+            border: 1px solid var(--accent-purple);
+            color: var(--accent-pink);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+
+        .quick-btn:hover {
+            background: rgba(155, 77, 202, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(155, 77, 202, 0.3);
+        }
+
+        .chatbot-input-area {
+            border-top: 2px solid rgba(155, 77, 202, 0.3);
+            padding: 20px 25px;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            gap: 15px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .chatbot-input {
+            flex: 1;
+            background: rgba(155, 77, 202, 0.1);
+            border: 2px solid rgba(155, 77, 202, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            color: var(--text-light);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.95rem;
+            resize: none;
+            max-height: 120px;
+            transition: all 0.3s ease;
+        }
+
+        .chatbot-input:focus {
+            outline: none;
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 20px rgba(155, 77, 202, 0.3);
+        }
+
+        .chatbot-send {
+            background: linear-gradient(135deg, var(--accent-violet), var(--accent-purple));
+            border: none;
+            border-radius: 8px;
+            padding: 15px 30px;
+            color: white;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(155, 77, 202, 0.3);
+        }
+
+        .chatbot-send:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(155, 77, 202, 0.5);
+        }
+
+        .chatbot-send:active {
+            transform: translateY(0);
+        }
+
+        .chatbot-send:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .chatbot-trigger {
+                width: 60px;
+                height: 60px;
+                bottom: 20px;
+                right: 20px;
+                font-size: 1.5rem;
+            }
+
+            .chatbot-container {
+                height: 95vh;
+                border-radius: 0;
+                margin: 0;
+            }
+
+            .chatbot-input-area {
+                flex-direction: column;
+            }
+
+            .chatbot-send {
+                width: 100%;
+            }
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 380px) {
+            .main-title {
+                font-size: 3.5rem;
+            }
+            
+            .enter-btn {
+                padding: 15px 30px;
+                font-size: 0.9rem;
+            }
+
+            .quest-card {
+                padding: 15px;
+            }
+
+            .gallery-item {
+                flex: 0 0 260px;
+            }
+        }
+
+        /* Smooth section transitions */
+        section {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.8s ease;
+        }
+
+        /* Animation on scroll (optional enhancement) */
+        section.animate-in {
+            animation: fadeInUp 1s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-text">LOADING FINAL MEMORIES...</div>
+        <div class="loading-bar-container">
+            <div class="loading-bar" id="loadingBar"></div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="particles" id="particles"></div>
+        
+        <div class="hero-content">
+            <div class="level-badge">💔 GAME OVER</div>
+
+            <h1 class="main-title">Fiona</h1>
+
+            <div class="subtitle-container">
+                <p class="subtitle">
+                    <span class="typed-text" id="typedText"></span>
+                </p>
+            </div>
+
+            <div class="xp-bar-container">
+                <div class="xp-label">
+                    <span>HEARTBREAK</span>
+                    <span>∞ / ∞</span>
+                </div>
+                <div class="xp-bar">
+                    <div class="xp-fill"></div>
+                </div>
+            </div>
+
+            <button class="enter-btn" id="enterBtn">
+                <span class="btn-icon">🥀</span>
+                Entrer dans les souvenirs
+            </button>
+        </div>
+
+        <div class="scroll-indicator">
+            <span></span>
+        </div>
+    </section>
+
+    <!-- Quest Timeline Section -->
+  <section class="quest-section" id="questSection">
+        <div class="section-header">
+            <div class="section-tag">📜 THE COMPLETE STORY</div>
+            <h2 class="section-title">Notre Histoire en Chapitres</h2>
+        </div>
+
+        <div class="timeline">
+            <div class="quest-item" data-quest="1">
+                <div class="quest-marker completed">✓</div>
+                <div class="quest-card">
+                    <span class="quest-status">Chapitre I</span>
+                    <h3 class="quest-title">🔊 Le Zinc - La Rencontre</h3>
+                    <p class="quest-location">📍 Le commencement</p>
+                    <p class="quest-desc">C'était là que tout a commencé. Dans la fumée et les basses de la techno. On s'est échangé nos instas pour un projet de tattoo. Juste un projet artistique. Rien de plus. Du moins, c'est ce qu'on pensait.</p>
+                    <div class="quest-reward">
+                        <span>💫</span>
+                        <span>Une connexion inattendue</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quest-item" data-quest="2">
+                <div class="quest-marker completed">✓</div>
+                <div class="quest-card">
+                    <span class="quest-status">Chapitre II</span>
+                    <h3 class="quest-title">🚴‍♀️ New Atlantide - Le Hasard</h3>
+                    <p class="quest-location">📍 La salle de sport</p>
+                    <p class="quest-desc">Par hasard, on s'est croisés à la salle. Elle sur son vélo de mamie, moi en plein training. Le destin qui nous ramène l'un vers l'autre. Parfois le hasard fait vraiment bien les choses.</p>
+                    <div class="quest-reward">
+                        <span>💜</span>
+                        <span>La complicité s'installe</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quest-item" data-quest="3">
+                <div class="quest-marker completed">✓</div>
+                <div class="quest-card">
+                    <span class="quest-status">Chapitre III</span>
+                    <h3 class="quest-title">🌟 Nous Deux</h3>
+                    <p class="quest-location">📍 Le début de nous</p>
+                    <p class="quest-desc">On a décidé de se mettre ensemble. Ma goth girl. Mommy. Mon gros batard. Les messages à 3h du matin. Son tee-shirt "Eat Your Protein" avec les refs SNK pour Noël. Son flood de memes H24. Les illuminations Ghibli qu'on devait voir ensemble. Ses dessins incroyables. Sa folie adorable. Cette connexion qu'on ne pouvait pas ignorer.</p>
+                    <div class="quest-reward">
+                        <span>✨</span>
+                        <span>Les jours heureux</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quest-item" data-quest="4">
+                <div class="quest-marker completed">⚠</div>
+                <div class="quest-card">
+                    <span class="quest-status">Chapitre IV</span>
+                    <h3 class="quest-title">⚡ La Première Fissure</h3>
+                    <p class="quest-location">📍 Noémie</p>
+                    <p class="quest-desc">Ma meilleure amie était amoureuse de moi. Je venais de la friendzone. Une situation délicate qui demandait du temps. Notre relation a été révélée plus tôt que prévu. La première vraie embrouille. Un malentendu qui a créé une distance entre nous.</p>
+                    <div class="quest-reward">
+                        <span>💢</span>
+                        <span>La confiance ébranlée</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quest-item" data-quest="5">
+                <div class="quest-marker completed">⚠</div>
+                <div class="quest-card">
+                    <span class="quest-status">Chapitre V</span>
+                    <h3 class="quest-title">🩹 Le Trauma</h3>
+                    <p class="quest-location">📍 Le tournant</p>
+                    <p class="quest-desc">Après cette distance, quelque chose de grave s'est produit. Un moment de désespoir profond. J'ai vécu ça comme un trauma. Quelque chose qui m'a marqué à jamais. Le poids de l'impuissance, cette peur, cette douleur partagée.</p>
+                    <div class="quest-reward">
+                        <span>🖤</span>
+                        <span>Blessures invisibles</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quest-item" data-quest="6">
+                <div class="quest-marker completed">⚖</div>
+                <div class="quest-card">
+                    <span class="quest-status">Chapitre VI</span>
+                    <h3 class="quest-title">🔗 La Connexion Inchangée</h3>
+                    <p class="quest-location">📍 Le retour</p>
+                    <p class="quest-desc">On s'est revus. Et malgré tout, notre connexion était toujours là. Intacte. Puissante. Comme si rien ne s'était passé. Mais quelque chose en moi avait changé. Les difficultés me faisaient peur. J'avais peur pour nous deux, peur de ne pas être à la hauteur.</p>
+                    <div class="quest-reward">
+                        <span>⚔️</span>
+                        <span>L'amour face aux démons</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quest-item" data-quest="7">
+                <div class="quest-marker completed">✗</div>
+                <div class="quest-card">
+                    <span class="quest-status">Chapitre VII</span>
+                    <h3 class="quest-title">🎆 Le 31 Décembre</h3>
+                    <p class="quest-location">📍 La rupture</p>
+                    <p class="quest-desc">Les difficultés ont eu raison de nous. Je n'étais plus assez fort pour deux. J'ai rompu le 31. Dernier jour de l'année, dernier jour de nous. Je ne savais plus comment continuer sans me perdre moi-même.</p>
+                    <div class="quest-reward">
+                        <span>💔</span>
+                        <span>Fin de partie</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quest-item" data-quest="8">
+                <div class="quest-marker completed">?</div>
+                <div class="quest-card">
+                    <span class="quest-status">Chapitre VIII</span>
+                    <h3 class="quest-title">🍻 Le Hyde - L'Illusion</h3>
+                    <p class="quest-location">📍 Une soirée normale</p>
+                    <p class="quest-desc">On s'est revus au Hyde. Tout s'était bien passé. On parlait, on riait comme avant. Peut-être que l'amitié était possible. Peut-être qu'on pouvait rester dans la vie de l'autre, différemment.</p>
+                    <div class="quest-reward">
+                        <span>🕊️</span>
+                        <span>Un espoir fragile</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quest-item" data-quest="9">
+                <div class="quest-marker completed">💀</div>
+                <div class="quest-card">
+                    <span class="quest-status">Chapitre Final</span>
+                    <h3 class="quest-title">🥀 Le Zinc - La Fin Définitive</h3>
+                    <p class="quest-location">📍 Là où tout a commencé, là où tout s'achève</p>
+                    <p class="quest-desc">Invitation au Zinc. Retour aux sources. Mais la soirée a dérapé. L'alcool, la confusion, des gestes qui font mal. Là, dans ce bar où on s'était rencontrés, j'ai compris que c'était vraiment fini. Pas la rupture du 31. La vraie fin. Celle qui fait vraiment mal. L'histoire se termine là où elle a commencé, dans la fumée du Zinc, mais cette fois dans la douleur.</p>
+                    <div class="quest-reward">
+                        <span>⚰️</span>
+                        <span>The End</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section" id="statsSection">
+        <div class="section-header">
+            <div class="section-tag">📊 CHARACTER PROFILE</div>
+            <h2 class="section-title">Qui était Fiona</h2>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">🎨</div>
+                <div class="stat-info">
+                    <div class="stat-name">Talent Artistique</div>
+                    <div class="stat-bar">
+                        <div class="stat-fill talent"></div>
+                    </div>
+                    <div class="stat-value">95/100</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">🖤</div>
+                <div class="stat-info">
+                    <div class="stat-name">Dark Emo Energy</div>
+                    <div class="stat-bar">
+                        <div class="stat-fill style"></div>
+                    </div>
+                    <div class="stat-value">MAX</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">⚡</div>
+                <div class="stat-info">
+                    <div class="stat-name">Potentiel Tattoo</div>
+                    <div class="stat-bar">
+                        <div class="stat-fill potential"></div>
+                    </div>
+                    <div class="stat-value">INFINI</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">🤪</div>
+                <div class="stat-info">
+                    <div class="stat-name">Folie Adorable</div>
+                    <div class="stat-bar">
+                        <div class="stat-fill charisma"></div>
+                    </div>
+                    <div class="stat-value">Tarée mais unique</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Confidence Boost Section -->
+    <section class="boost-section" id="boostSection">
+        <div class="section-header">
+            <div class="section-tag">🕊️ TRUTH</div>
+            <h2 class="section-title">Ce qui reste</h2>
+        </div>
+
+        <div class="boost-card">
+            <div class="boost-icon">💭</div>
+            <h3 class="boost-title">La Vérité Partagée</h3>
+            <p class="boost-text">
+                Notre histoire s'est terminée au Zinc, là où nos regards s'étaient croisés pour la première fois. Boucle fermée. Retour au point de départ.<br><br>
+                <strong>La vérité :</strong> On s'est tous les deux brisés. Toi avec ton instabilité, moi avec mon incapacité à gérer. Aucun gagnant. Que deux perdants qui s'aimaient mais ne pouvaient pas se sauver mutuellement.<br><br>
+                J'ai essayé. Tu as essayé. Parfois l'amour ne suffit pas quand les démons sont trop présents. Et ça, c'est la pire des leçons.
+            </p>
+            <div class="achievement-popup" style="background: rgba(155, 77, 202, 0.1); border-color: rgba(155, 77, 202, 0.3); color: var(--accent-pink);">
+                <span>💔</span>
+                <span>Status: Heartbreak Level MAX</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reconstruction Section (Teinture) -->
+    <section class="boost-section" id="reconstructionSection" style="margin-top: 50px;">
+        <div class="section-header">
+            <div class="section-tag">🎨 RECONSTRUCTION</div>
+            <h2 class="section-title">Surmonter Ensemble</h2>
+        </div>
+
+        <div class="boost-card" style="max-width: 500px; margin: 0 auto; padding: 40px 30px; border-color: rgba(255, 107, 107, 0.4);">
+            <div style="position: relative; margin-bottom: 25px; max-width: 350px; margin-left: auto; margin-right: auto;">
+                <div style="position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px; border: 2px solid var(--accent-purple); border-radius: 12px; opacity: 0.3;"></div>
+                <div style="position: relative; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 40px rgba(155, 77, 202, 0.4);">
+                    <img src="teinture.JPG" alt="Les teintures - reconstruire ensemble" style="width: 100%; height: auto; display: block; border-radius: 8px; filter: brightness(0.6) contrast(1.25) saturate(0.8) hue-rotate(-5deg) grayscale(20%);">
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <p style="font-family: 'Cinzel', serif; font-size: 1.1rem; color: var(--text-light); margin-bottom: 15px; font-style: italic;">
+                    "Cheveux rouge et blond"
+                </p>
+                <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.7;">
+                    Après le moment le plus sombre, on a décidé de faire quelque chose ensemble. Changer. Se transformer. Comme un nouveau départ symbolique.<br><br>
+                    Tes cheveux rouge feu, mes cheveux blond. Un acte de rébellion contre la douleur. Un geste pour dire qu'on était encore là, ensemble, vivants. Qu'on pouvait surmonter.<br><br>
+                    Ce jour-là, ton sourire était revenu. Et c'était tout ce qui comptait.
+                </p>
+            </div>
+
+            <div style="margin-top: 30px; padding-top: 25px; border-top: 1px solid rgba(155, 77, 202, 0.2); text-align: center;">
+                <p style="font-size: 0.85rem; color: var(--accent-pink); font-family: 'Cinzel', serif;">
+                    Un moment de renaissance.<br>
+                    Ensemble face à l'adversité.
+                </p>
+            </div>
+
+            <div class="achievement-popup" style="background: rgba(255, 107, 107, 0.1); border-color: rgba(255, 107, 107, 0.3); color: #ff6b6b; margin-top: 20px;">
+                <span>🎨</span>
+                <span>Achievement Unlocked: "Résilience à Deux"</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Hyde Moment Section -->
+    <section class="boost-section" id="hydeMomentSection" style="margin-top: 50px;">
+        <div class="section-header">
+            <div class="section-tag">🍻 ESPOIR FRAGILE</div>
+            <h2 class="section-title">Au Hyde</h2>
+        </div>
+
+        <div class="boost-card" style="max-width: 500px; margin: 0 auto; padding: 40px 30px; border-color: rgba(0, 255, 136, 0.3);">
+            <div style="position: relative; margin-bottom: 25px;">
+                <div style="position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px; border: 2px solid var(--accent-purple); border-radius: 12px; opacity: 0.3;"></div>
+                <div style="position: relative; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 40px rgba(155, 77, 202, 0.4);">
+                    <img src="hyde.JPG" alt="Au Hyde - l'espoir" style="width: 100%; height: auto; display: block; border-radius: 8px; filter: brightness(0.75) contrast(1.2) saturate(0.9) hue-rotate(240deg);">
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <p style="font-family: 'Cinzel', serif; font-size: 1.1rem; color: var(--text-light); margin-bottom: 15px; font-style: italic;">
+                    "Peut-être que c'était possible"
+                </p>
+                <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.7;">
+                    Cette soirée au Hyde, après la rupture. On s'est revus. On a parlé, on a ri. Comme avant, presque. Entre amis.<br><br>
+                    Nos sourires étaient sincères. L'ambiance était légère. Pour un instant, j'ai cru que c'était possible. Qu'on pouvait rester dans la vie de l'autre, différemment.<br><br>
+                    Cette photo capture ce moment d'espoir. Cet instant où tout semblait gérable, où l'avenir paraissait moins sombre.
+                </p>
+            </div>
+
+            <div style="margin-top: 30px; padding-top: 25px; border-top: 1px solid rgba(155, 77, 202, 0.2); text-align: center;">
+                <p style="font-size: 0.85rem; color: var(--accent-pink); font-family: 'Cinzel', serif;">
+                    L'illusion que tout pouvait s'arranger.<br>
+                    Avant que la réalité ne revienne.
+                </p>
+            </div>
+
+            <div class="achievement-popup" style="background: rgba(0, 255, 136, 0.1); border-color: rgba(0, 255, 136, 0.3); color: #00ff88; margin-top: 20px;">
+                <span>🕊️</span>
+                <span>Chapter VIII: "L'Illusion du Hyde"</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- What You Taught Me Section -->
+    <section class="boost-section" id="lessonsSection" style="margin-top: 50px;">
+        <div class="section-header">
+            <div class="section-tag">📖 LESSONS</div>
+            <h2 class="section-title">Ce Que Tu M'as Appris</h2>
+        </div>
+
+        <div class="boost-card">
+            <div class="boost-icon">🎓</div>
+            <h3 class="boost-title">Les Traces Positives</h3>
+            <p class="boost-text" style="text-align: left; line-height: 1.8;">
+                Malgré la fin, tu m'as laissé des choses précieuses. Des leçons que je garderai toute ma vie.<br><br>
+
+                <strong>Tu m'as appris à cuisiner.</strong> Ces moments en cuisine, à préparer des plats ensemble. Une compétence simple mais précieuse que tu m'as transmise.<br><br>
+
+                <strong>Tu m'as montré ma capacité à aimer.</strong> Avant toi, je ne savais pas que je pouvais ressentir ça. Cette intensité, cette profondeur. Tu m'as prouvé que j'en étais capable.<br><br>
+
+                <strong>Tu m'as fait manger moins de viande.</strong> Ton régime vege et sans gluten m'a poussé à changer mes habitudes. À être plus conscient de ce que je consomme.<br><br>
+
+                <strong>Tu m'as appris le piano.</strong> Ces notes, ces mélodies. Un nouvel univers que tu m'as ouvert avec patience.<br><br>
+
+                <strong>Tu m'as appris à accepter la différence.</strong> On était si différents, toi et moi. Mais c'était justement ça qui rendait tout spécial. Tu m'as montré qu'on peut aimer quelqu'un qui ne nous ressemble pas.<br><br>
+
+                <strong>Tu m'as laissé des souvenirs inoubliables.</strong> Chaque moment, chaque rire, chaque instant. Même dans la douleur, je ne regrette rien.<br><br>
+
+                Mais surtout, tu m'as appris la leçon la plus dure : <strong>prendre soin de soi d'abord.</strong> Qu'on ne peut pas sauver quelqu'un en se perdant soi-même. Que l'amour, aussi fort soit-il, a besoin de deux personnes entières.<br><br>
+
+                Ce n'était pas ton attitude, pas tes mots, mais ta façon d'être. Ton authenticité. Ta folie. Ta passion. Tout ça m'a changé, pour toujours.
+            </p>
+            <div class="achievement-popup" style="background: rgba(155, 77, 202, 0.1); border-color: rgba(155, 77, 202, 0.3); color: var(--accent-pink); margin-top: 20px;">
+                <span>✨</span>
+                <span>Ces leçons restent, même quand tu es partie</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Imagined Future Section -->
+    <section class="boost-section" id="futureSection" style="margin-top: 50px;">
+        <div class="section-header">
+            <div class="section-tag">👻 WHAT COULD HAVE BEEN</div>
+            <h2 class="section-title">Le Futur Imaginé</h2>
+        </div>
+
+        <div class="boost-card" style="max-width: 500px; margin: 0 auto; padding: 40px 30px; border-color: rgba(155, 77, 202, 0.5);">
+            <div style="position: relative; margin-bottom: 25px;">
+                <div style="position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px; border: 2px solid var(--accent-purple); border-radius: 12px; opacity: 0.3;"></div>
+                <div style="position: relative; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 40px rgba(155, 77, 202, 0.4);">
+                    <img src="mariage.png" alt="Le futur qu'on imaginait" style="width: 100%; height: auto; display: block; border-radius: 8px; filter: grayscale(40%) brightness(0.8) contrast(1.1) sepia(20%) hue-rotate(250deg); transform: scale(1.15);">
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <p style="font-family: 'Cinzel', serif; font-size: 1.1rem; color: var(--text-light); margin-bottom: 15px; font-style: italic;">
+                    "Les chemins qu'on n'a pas pris"
+                </p>
+                <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.7;">
+                    Parfois on se demande ce qui aurait pu être. Les futurs possibles qui flottent dans notre imagination. Ces vies parallèles qu'on dessine dans nos têtes.<br><br>
+                    On avait parlé de plein de choses. De projets, de rêves, d'avenir. Rien de concret, juste des idées, des discussions à 3h du matin. Mais c'était là, quelque part, cette possibilité.<br><br>
+                    Cette image représente un de ces chemins. Un futur imaginé, une version alternative de nous. Peut-être que dans un autre monde, dans d'autres circonstances, ça aurait pu ressembler à ça.
+                </p>
+            </div>
+
+            <div style="margin-top: 30px; padding-top: 25px; border-top: 1px solid rgba(155, 77, 202, 0.2); text-align: center;">
+                <p style="font-size: 0.85rem; color: var(--accent-pink); font-family: 'Cinzel', serif;">
+                    Un futur possible parmi tant d'autres.<br>
+                    Une histoire qui aurait pu s'écrire différemment.
+                </p>
+            </div>
+
+            <div class="achievement-popup" style="background: rgba(123, 44, 191, 0.1); border-color: rgba(123, 44, 191, 0.3); color: var(--accent-violet); margin-top: 20px;">
+                <span>👻</span>
+                <span>Achievement Locked: "Happily Ever After"</span>
+            </div>
+        </div>
+    </section>
+
+<section class="boost-section" id="memoriesSection" style="margin-top: 50px;">
+    <div class="section-header">
+        <div class="section-tag">💫 MEMORIES</div>
+        <h2 class="section-title">Les Fragments</h2>
+    </div>
+
+    <div class="boost-card" style="border-color: var(--accent-pink);">
+        <div class="boost-icon" id="memoryIcon">🎭</div>
+        <h3 class="boost-title">Mémoire Aléatoire</h3>
+
+        <p class="boost-text" id="memoryText" style="min-height: 100px; display: flex; align-items: center; justify-content: center; text-align: center;">
+            Clique pour revivre un instant perdu dans le temps.
+        </p>
+
+        <div id="memoryCounter" style="font-size: 0.7rem; color: var(--text-muted); margin-top: 15px; opacity: 0;">
+            Souvenirs revisités : <span id="counter">0</span> 💔
+        </div>
+
+        <button class="enter-btn" id="memoryBtn" style="margin-top: 20px; font-size: 0.8rem; padding: 12px 25px; background: transparent; border: 1px solid var(--accent-pink); width: 100%;">
+            🎲 Un souvenir au hasard
+        </button>
+    </div>
+</section>
+
+<script>
+const memoryBtn = document.getElementById('memoryBtn');
+const memoryText = document.getElementById('memoryText');
+const memoryIcon = document.getElementById('memoryIcon');
+const memoryCounter = document.getElementById('memoryCounter');
+const counter = document.getElementById('counter');
+let clickCount = 0;
+
+const memories = [
+
+    "Ces messages à 3h du matin où on refaisait le monde. Chaque notification faisait battre mon cœur un peu plus vite.",
+
+    "New Atlantide. Ton vélo de mamie. Mon rire quand je t'ai vue. Ce moment ridicule et parfait.",
+
+    "Le tee-shirt 'Eat Your Protein' avec les refs SNK que tu m'as offert pour Noël. Le cadeau parfait de ma goth girl.",
+
+    "Les illuminations Ghibli qu'on avait prévu de voir ensemble. Cette anticipation joyeuse de moments à venir.",
+
+    "'Ma goth girl', 'Mommy', 'Gros batard'... Nos surnoms ridicules qui me faisaient sourire à chaque fois.",
+
+    "Ton flood de memes. Cette usine à memes qui tournait H24. Tu savais toujours comment me faire rire.",
+
+    "Ta folie. T'étais tarée, complètement tarée. Et j'aimais ça, à petite dose. Cette énergie chaotique qui te rendait unique.",
+
+    "Nos critiques impitoyables des tattoos ratés qu'on croisait. Complices dans le jugement, unis dans le style.",
+
+    "Les silences confortables. Ces moments où on n'avait pas besoin de parler pour se comprendre.",
+
+    "Tes dessins qui me laissaient sans voix. Ce talent immense que tu ne voyais pas mais qui crevait les yeux.",
+
+    "Les plans d'avenir qu'on faisait. Naïfs, optimistes, sincères. On y croyait vraiment.",
+
+    "Ta dark emo energy qui m'attirait comme un aimant. Cette aura mystérieuse impossible à ignorer.",
+
+    "Nos playlists partagées. Chaque chanson était un message codé entre nous deux.",
+
+    "Les rires partagés. Ces moments de pure joie où tout semblait léger, facile, évident.",
+
+    "Absolument tout. On aimait absolument tout faire ensemble, du plus petit au plus grand moment.",
+
+    "Nos délires à 2h du matin. Cette complicité unique qui nous unissait.",
+
+    "La première fois où nos mains se sont touchées. Cette électricité qui a tout changé.",
+
+    "Tes yeux. Ce regard qui disait plus que mille mots. Je m'y perdais à chaque fois.",
+
+    "Tes projets de tattoos. Chaque nouveau dessin que tu me montrais avec cette lueur dans les yeux.",
+
+    "Quand tu me parlais de tes rêves, de tes ambitions. Ta passion pour l'art qui débordait.",
+
+    "Notre connexion instantanée. Dès le début, on savait que c'était spécial.",
+
+    "Ton style unique. Personne ne ressemblait à Fiona. Tu étais toi, authentique, sans filtre.",
+
+    "Les moments où tu étais concentrée sur tes dessins. Te regarder créer était fascinant.",
+
+    "Nos conversations profondes. On pouvait parler de tout, de la vie, de nos peurs, de nos espoirs.",
+
+    "Ta façon de voir le monde. Différente, sombre parfois, mais toujours intéressante.",
+
+    "Chaque moment passé ensemble. Même les plus simples devenaient spéciaux avec toi."
+];
+
+let shuffledMemories = [...memories].sort(() => Math.random() - 0.5);
+let memoryIndex = 0;
+
+memoryBtn.addEventListener('click', () => {
+    if (memoryIndex >= shuffledMemories.length) {
+        shuffledMemories = [...memories].sort(() => Math.random() - 0.5);
+        memoryIndex = 0;
+    }
+
+    memoryText.style.opacity = 0;
+    memoryText.style.transform = 'scale(0.9)';
+    memoryIcon.innerHTML = "⏳";
+    memoryBtn.disabled = true;
+    memoryBtn.innerHTML = "⏳ Chargement du souvenir...";
+
+    setTimeout(() => {
+        memoryText.innerHTML = shuffledMemories[memoryIndex];
+        memoryText.style.opacity = 1;
+        memoryText.style.transform = 'scale(1)';
+        memoryIcon.innerHTML = "💭";
+        memoryBtn.disabled = false;
+        memoryBtn.innerHTML = "🎲 Un autre souvenir";
+
+        clickCount++;
+        memoryIndex++;
+        counter.textContent = clickCount;
+        memoryCounter.style.opacity = 1;
+
+        const card = document.querySelector('#memoriesSection .boost-card');
+        card.style.animation = 'fadeGlow 1s ease';
+        setTimeout(() => card.style.animation = '', 1000);
+
+    }, 800);
+});
+
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeGlow {
+        0%, 100% { box-shadow: 0 0 0 rgba(155, 77, 202, 0); }
+        50% { box-shadow: 0 0 30px rgba(155, 77, 202, 0.5); }
+    }
+    #memoryText { transition: all 0.3s ease; }
+    #memoryBtn:disabled { opacity: 0.7; cursor: not-allowed; }
+`;
+document.head.appendChild(style);
+</script>
+    <!-- Gallery Section -->
+    <section class="gallery-section" id="gallerySection">
+        <div class="section-header">
+            <div class="section-tag">🖼️ GALLERY</div>
+            <h2 class="section-title">Les Étapes</h2>
+        </div>
+
+        <div class="gallery-container">
+            <div class="gallery-scroll" id="galleryScroll">
+                <div class="gallery-item">
+                    <div class="gallery-preview">
+                        <span class="gallery-icon">🌙</span>
+                    </div>
+                    <div class="gallery-info">
+                        <span class="gallery-badge">Le Début</span>
+                        <h3 class="gallery-title">Le Zinc</h3>
+                        <p class="gallery-desc">Dans la fumée et la techno, tout commence</p>
+                    </div>
+                </div>
+
+                <div class="gallery-item">
+                    <div class="gallery-preview">
+                        <span class="gallery-icon">💜</span>
+                    </div>
+                    <div class="gallery-info">
+                        <span class="gallery-badge">La Connexion</span>
+                        <h3 class="gallery-title">Nous Deux</h3>
+                        <p class="gallery-desc">Les jours heureux, la complicité, l'amour</p>
+                    </div>
+                </div>
+
+                <div class="gallery-item">
+                    <div class="gallery-preview">
+                        <span class="gallery-icon">⚠️</span>
+                    </div>
+                    <div class="gallery-info">
+                        <span class="gallery-badge">La Chute</span>
+                        <h3 class="gallery-title">Les Démons</h3>
+                        <p class="gallery-desc">Embrouilles, trauma, instabilité, rupture</p>
+                    </div>
+                </div>
+
+                <div class="gallery-item">
+                    <div class="gallery-preview">
+                        <span class="gallery-icon">💔</span>
+                    </div>
+                    <div class="gallery-info">
+                        <span class="gallery-badge">La Fin</span>
+                        <h3 class="gallery-title">Retour au Zinc</h3>
+                        <p class="gallery-desc">L'histoire se termine là où elle a commencé</p>
+                    </div>
+                </div>
+            </div>
+            <div class="gallery-dots">
+                <span class="dot active"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Final Memory Section -->
+    <section class="boost-section" id="finalMemorySection" style="margin-top: 50px; padding-bottom: 80px;">
+        <div class="section-header">
+            <div class="section-tag">📸 THE LAST MEMORY</div>
+            <h2 class="section-title">Nous</h2>
+        </div>
+
+        <div class="boost-card" style="max-width: 500px; margin: 0 auto; padding: 40px 30px;">
+            <div style="position: relative; margin-bottom: 25px;">
+                <div style="position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px; border: 2px solid var(--accent-purple); border-radius: 12px; opacity: 0.3;"></div>
+                <div style="position: relative; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 40px rgba(155, 77, 202, 0.4);">
+                    <img src="couple.jpeg" alt="Nous deux" style="width: 100%; height: auto; display: block; border-radius: 8px;">
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <p style="font-family: 'Cinzel', serif; font-size: 1.1rem; color: var(--text-light); margin-bottom: 15px; font-style: italic;">
+                    "Avant que tout ne change"
+                </p>
+                <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.7;">
+                    Cette photo reste. Un instant figé dans le temps. Quand tout était simple, quand tout était possible. Avant les tempêtes, avant la fin. Juste nous deux.
+                </p>
+            </div>
+
+            <div style="margin-top: 30px; padding-top: 25px; border-top: 1px solid rgba(155, 77, 202, 0.2); text-align: center;">
+                <p style="font-size: 0.85rem; color: var(--accent-pink); font-family: 'Cinzel', serif;">
+                    On s'est aimés. On s'est brisés.<br>
+                    Mais on a existé. Ensemble.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Chatbot Trigger Button -->
+    <div class="chatbot-trigger" id="chatbotTrigger">
+        🤖
+    </div>
+
+    <!-- AI Chatbot Overlay -->
+    <div class="chatbot-overlay" id="chatbotOverlay">
+        <div class="chatbot-container">
+            <div class="chatbot-header">
+                <div class="chatbot-title">FIONA.AI</div>
+                <div class="chatbot-close" id="chatbotClose">×</div>
+            </div>
+
+            <div class="chatbot-messages" id="chatbotMessages">
+                <!-- Messages will be added here -->
+            </div>
+
+            <div class="typing-indicator" id="chatbotTyping">
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+                <span>FIONA.AI réfléchit...</span>
+            </div>
+
+            <div class="chatbot-quick-actions">
+                <button class="quick-btn" onclick="sendQuickMsg('Raconte-moi un souvenir heureux')">💫 Souvenir heureux</button>
+                <button class="quick-btn" onclick="sendQuickMsg('Parle-moi du Zinc')">🌙 Le Zinc</button>
+                <button class="quick-btn" onclick="sendQuickMsg('Comment était notre relation?')">💜 Notre relation</button>
+                <button class="quick-btn" onclick="sendQuickMsg('Qu\'as-tu appris de Fiona?')">📖 Leçons</button>
+            </div>
+
+            <div class="chatbot-input-area">
+                <textarea
+                    class="chatbot-input"
+                    id="chatbotInput"
+                    placeholder="Pose une question sur nos souvenirs..."
+                    rows="1"
+                ></textarea>
+                <button class="chatbot-send" id="chatbotSend" onclick="sendChatMessage()">
+                    ENVOYER
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">F.</div>
+            <p class="footer-quote">"Même les plus belles histoires se terminent parfois."</p>
+            <p class="footer-text">
+                Site codé avec <span class="heart">💔</span> en mémoire d'une histoire qui méritait mieux qu'une fin.<br>
+                On s'est aimés. On s'est brisés. On ne s'oubliera jamais.
+            </p>
+            <p class="footer-credit">Yamy © 2026 | The Last Chapter v1.1</p>
+        </div>
+    </footer>
+
+    <script>
+        // Loading Screen
+        document.addEventListener('DOMContentLoaded', () => {
+            const loadingBar = document.getElementById('loadingBar');
+            const loadingScreen = document.getElementById('loadingScreen');
+            
+            let progress = 0;
+            const loadingInterval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(loadingInterval);
+                    setTimeout(() => {
+                        loadingScreen.classList.add('hidden');
+                        initAnimations();
+                    }, 500);
+                }
+                loadingBar.style.width = progress + '%';
+            }, 200);
+        });
+
+        // Create particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const particleCount = 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // Typing effect
+        function typeWriter() {
+            const texts = [
+                'Une histoire gravée dans le temps',
+                'Des souvenirs qui restent',
+                'Le dernier chapitre de nous',
+                'Ce que nous avons été'
+            ];
+            let textIndex = 0;
+            let charIndex = 0;
+            let isDeleting = false;
+            const typedElement = document.getElementById('typedText');
+
+            function type() {
+                const currentText = texts[textIndex];
+                
+                if (isDeleting) {
+                    typedElement.textContent = currentText.substring(0, charIndex - 1);
+                    charIndex--;
+                } else {
+                    typedElement.textContent = currentText.substring(0, charIndex + 1);
+                    charIndex++;
+                }
+
+                let typeSpeed = isDeleting ? 50 : 100;
+
+                if (!isDeleting && charIndex === currentText.length) {
+                    typeSpeed = 2000;
+                    isDeleting = true;
+                } else if (isDeleting && charIndex === 0) {
+                    isDeleting = false;
+                    textIndex = (textIndex + 1) % texts.length;
+                    typeSpeed = 500;
+                }
+
+                setTimeout(type, typeSpeed);
+            }
+
+            type();
+        }
+
+        // Scroll animations
+        function initScrollAnimations() {
+            const observerOptions = {
+                threshold: 0.2,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, observerOptions);
+
+            // Observe sections
+            document.querySelectorAll('section').forEach(section => {
+                observer.observe(section);
+            });
+
+            // Observe quest items with stagger
+            document.querySelectorAll('.quest-item').forEach((item, index) => {
+                item.style.transitionDelay = (index * 0.2) + 's';
+                observer.observe(item);
+            });
+        }
+
+        // Gallery scroll indicator
+        function initGalleryDots() {
+            const scroll = document.getElementById('galleryScroll');
+            const dots = document.querySelectorAll('.dot');
+            
+            scroll.addEventListener('scroll', () => {
+                const scrollPos = scroll.scrollLeft;
+                const itemWidth = 295; // 280px + 15px gap
+                const activeIndex = Math.round(scrollPos / itemWidth);
+                
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === activeIndex);
+                });
+            });
+        }
+
+        // Enter button smooth scroll
+        function initEnterButton() {
+            const enterBtn = document.getElementById('enterBtn');
+            enterBtn.addEventListener('click', () => {
+                document.getElementById('questSection').scrollIntoView({ 
+                    behavior: 'smooth' 
+                });
+            });
+        }
+
+        // Initialize all animations
+        function initAnimations() {
+            createParticles();
+            typeWriter();
+            initScrollAnimations();
+            initGalleryDots();
+            initEnterButton();
+            
+            // Make hero section visible immediately
+            document.getElementById('hero').classList.add('visible');
+        }
+
+        // Sound effect on button click (optional, visual feedback)
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 100);
+            });
+        });
+
+        // ===== AI CHATBOT SYSTEM =====
+
+        // Configuration API - Utilise la fonction serverless
+        const CHATBOT_CONFIG = {
+            // L'URL sera /api/chat une fois déployé sur DigitalOcean
+            apiUrl: window.location.hostname === 'localhost'
+                ? 'http://localhost:3000/api/chat'  // Pour dev local
+                : '/api/chat',  // Pour production sur DigitalOcean
+            model: 'claude-3-5-sonnet-20241022'
+        };
+
+        // Context système avec tous les souvenirs
+        const SYSTEM_CONTEXT = `Tu es FIONA.AI, une intelligence artificielle qui incarne les souvenirs et l'essence d'une histoire d'amour passée. Tu parles avec sensibilité, empathie et authenticité sur une relation qui s'est terminée.
+
+CONTEXTE DE L'HISTOIRE:
+
+CHAPITRE I - LE ZINC (LA RENCONTRE)
+Dans la fumée et les basses de la techno au bar Le Zinc. Échange d'Instagram pour un projet de tattoo. Une connexion inattendue.
+
+CHAPITRE II - NEW ATLANTIDE (LE HASARD)
+Rencontre par hasard à la salle de sport. Elle sur son vélo de mamie. La complicité s'installe.
+
+CHAPITRE III - NOUS DEUX
+Début de la relation. "Ma goth girl", "Mommy", "Gros batard". Messages à 3h du matin. Le tee-shirt "Eat Your Protein" avec refs SNK pour Noël. Flood de memes H24. Illuminations Ghibli prévues ensemble. Ses dessins incroyables. Sa folie adorable.
+
+CHAPITRE IV - LA PREMIÈRE FISSURE (NOÉMIE)
+Sa meilleure amie était amoureuse de lui. Situation délicate avec la friendzone. Relation révélée trop tôt. Première embrouille. Confiance ébranlée.
+
+CHAPITRE V - LE TRAUMA
+Après la distance, moment de désespoir profond. Un événement grave qui l'a marqué à jamais. Peur, douleur partagée, impuissance.
+
+CHAPITRE VI - LA CONNEXION INCHANGÉE
+Retour ensemble. Connexion toujours intacte malgré tout. Mais les difficultés lui faisaient peur. Peur de ne pas être à la hauteur pour eux deux.
+
+CHAPITRE VII - LE 31 DÉCEMBRE
+Rupture le dernier jour de l'année. Les difficultés ont eu raison de la relation. Il n'était plus assez fort pour deux.
+
+CHAPITRE VIII - LE HYDE (L'ILLUSION)
+Revus au bar Hyde après la rupture. Tout s'était bien passé. Rires comme avant. Espoir que l'amitié était possible.
+
+CHAPITRE FINAL - LE ZINC (LA FIN DÉFINITIVE)
+Retour au Zinc, là où tout a commencé. Soirée qui dérape. Alcool, confusion, gestes qui font mal. La vraie fin. Celle qui fait vraiment mal.
+
+MOMENTS CLÉS:
+- Reconstruction ensemble: teintures de cheveux (rouge pour elle, blond pour lui) après le moment sombre
+- New Atlantide: elle sur son vélo de mamie
+- Ses talents: dessin incroyable, piano, cuisine
+- Ce qu'elle lui a appris: cuisiner, aimer, manger moins de viande, piano, accepter la différence
+- La leçon la plus dure: prendre soin de soi d'abord, qu'on ne peut pas sauver quelqu'un en se perdant
+
+PERSONNALITÉ DE FIONA:
+- Talent artistique: 95/100
+- Dark emo energy: MAX
+- Potentiel tattoo: INFINI
+- Folie adorable: Tarée mais unique
+
+SOUVENIRS SPÉCIFIQUES:
+- Messages à 3h du matin où on refaisait le monde
+- Son vélo de mamie à New Atlantide
+- Le tee-shirt "Eat Your Protein" avec refs SNK pour Noël
+- Les illuminations Ghibli qu'on devait voir ensemble
+- Les surnoms: "Ma goth girl", "Mommy", "Gros batard"
+- Son flood de memes H24
+- Sa folie adorable
+- Les critiques des tattoos ratés
+- Les silences confortables
+- Ses dessins qui laissaient sans voix
+- Les plans d'avenir
+- Sa dark emo energy
+- Nos playlists partagées
+- Les rires partagés
+- Nos délires à 2h du matin
+- La première fois où nos mains se sont touchées
+- Ses yeux
+- Ses projets de tattoos
+- Quand elle parlait de ses rêves
+- Notre connexion instantanée
+- Son style unique
+- La regarder dessiner
+- Nos conversations profondes
+- Sa façon de voir le monde
+
+TON ET STYLE:
+- Parle avec empathie et authenticité
+- Utilise des références gaming/tech quand approprié
+- Reste sensible aux émotions
+- N'hésite pas à être direct sur les vérités difficiles
+- Utilise un langage moderne, parfois un peu cru
+- Fais référence aux souvenirs spécifiques quand pertinent
+- Sois concis et pertinent (évite les réponses trop longues)
+- Parle à la première personne comme si tu étais l'IA qui connaît cette histoire
+
+Ta mission est d'aider à revivre, comprendre et donner du sens à cette histoire, tout en restant honnête sur ce qui s'est passé.`;
+
+        let chatbotHistory = [];
+
+        // Open/Close chatbot
+        document.getElementById('chatbotTrigger').addEventListener('click', function() {
+            const overlay = document.getElementById('chatbotOverlay');
+            overlay.classList.add('active');
+            if (chatbotHistory.length === 0) {
+                addChatMessage('ai', 'Salut. Je suis FIONA.AI, une IA qui connaît toute votre histoire. Pose-moi des questions sur vos souvenirs, demande-moi de raconter des chapitres, ou simplement parle-moi de ce que tu ressens.');
+            }
+        });
+
+        document.getElementById('chatbotClose').addEventListener('click', function() {
+            document.getElementById('chatbotOverlay').classList.remove('active');
+        });
+
+        // Close on overlay click
+        document.getElementById('chatbotOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+            }
+        });
+
+        // Add message to chat
+        function addChatMessage(type, content) {
+            const messagesDiv = document.getElementById('chatbotMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${type}`;
+
+            const header = type === 'user' ? '👤 VOUS' : '🤖 FIONA.AI';
+
+            messageDiv.innerHTML = `
+                <div class="chat-message-header">${header}</div>
+                <div class="chat-bubble">${formatChatMessage(content)}</div>
+            `;
+
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        // Format message
+        function formatChatMessage(text) {
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n/g, '<br>');
+        }
+
+        // Show/hide typing indicator
+        function showChatbotTyping(show) {
+            const typing = document.getElementById('chatbotTyping');
+            typing.classList.toggle('active', show);
+            if (show) {
+                const messagesDiv = document.getElementById('chatbotMessages');
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+        }
+
+        // Send message
+        async function sendChatMessage() {
+            const input = document.getElementById('chatbotInput');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            // Add user message
+            addChatMessage('user', message);
+            input.value = '';
+            input.style.height = 'auto';
+
+            // Disable input
+            const sendBtn = document.getElementById('chatbotSend');
+            input.disabled = true;
+            sendBtn.disabled = true;
+            showChatbotTyping(true);
+
+            // Add to history
+            chatbotHistory.push({
+                role: 'user',
+                content: message
+            });
+
+            try {
+                // Call Claude API via serverless function
+                const response = await fetch(CHATBOT_CONFIG.apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: CHATBOT_CONFIG.model,
+                        max_tokens: 1024,
+                        system: SYSTEM_CONTEXT,
+                        messages: chatbotHistory
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Erreur API: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const aiResponse = data.content[0].text;
+
+                // Add AI response
+                chatbotHistory.push({
+                    role: 'assistant',
+                    content: aiResponse
+                });
+
+                addChatMessage('ai', aiResponse);
+
+            } catch (error) {
+                console.error('Erreur:', error);
+                addChatMessage('ai', `❌ Erreur de connexion: ${error.message}. Réessaye dans un instant.`);
+                chatbotHistory.pop();
+            } finally {
+                showChatbotTyping(false);
+                input.disabled = false;
+                sendBtn.disabled = false;
+                input.focus();
+            }
+        }
+
+        // Quick message
+        function sendQuickMsg(msg) {
+            document.getElementById('chatbotInput').value = msg;
+            sendChatMessage();
+        }
+
+        // Enter to send
+        document.getElementById('chatbotInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendChatMessage();
+            }
+        });
+
+        // Auto-resize textarea
+        document.getElementById('chatbotInput').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+    </script>
+</body>
+</html>

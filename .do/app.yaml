@@ -1,0 +1,20 @@
+# Configuration DigitalOcean App Platform
+name: fiona-site
+region: nyc
+
+static_sites:
+  - name: web
+    github:
+      branch: main
+      deploy_on_push: true
+    build_command: echo "No build needed"
+    output_dir: /
+    index_document: index.html
+    error_document: index.html
+    routes:
+      - path: /
+
+functions:
+  - name: chat
+    source_dir: api
+    runtime: nodejs:20
